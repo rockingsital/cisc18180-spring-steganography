@@ -8,6 +8,9 @@ import java.math.BigInteger;
 
 
 public class KeyGenerate {
+	public static void main(String[] args){
+		System.out.println(generate());
+	}
 	
 	public static String generate(){
 		KeyGenerator kgen = null;
