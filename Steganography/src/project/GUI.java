@@ -1,17 +1,21 @@
 package project;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 public class GUI extends JPanel implements ActionListener{
 	
 	JTextField pictureLocation, password, desiredLocation;
+	JComponent pictureDisplay;
 	
 	public GUI(){
-		
+
+		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		JPanel panel = new JPanel();
 		panel.add(createInformationField());
 		panel.add(createButton());
@@ -70,20 +74,27 @@ public class GUI extends JPanel implements ActionListener{
 		File fromFile = new File(pictureLocation.getText());
 		String pass = password.getText();
 		File toFile = new File(desiredLocation.getText());
-		Desktop desktop = Desktop.getDesktop();
-		try{
-			desktop.open(fromFile);
-		} catch(IOException e){
-			System.out.println("File does not exist");
+		ImagePanel imgPanel = new ImagePanel(desiredLocation);
+		add(imgPanel);
+		this.resize(imgPanel);
 		}
+	
+	public void resize(ImagePanel imgPanel){
+		
+		System.out.println(this.getWidth());
+		this.setSize(this.getWidth()+imgPanel.image.getWidth(),
+						this.getHeight()+imgPanel.image.getHeight());
+		System.out.println(this.getWidth());
+		this.updateUI();
+		this.setPreferredSize(new Dimension(200,150));
 	}
 	
 	public static void createAndShowGUI(){
 		
 		JFrame frame = new JFrame("Steganography");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 200);
         frame.getContentPane().add(new GUI());
+        frame.pack();
         frame.setVisible(true);
 	}
 	
