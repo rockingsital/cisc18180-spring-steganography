@@ -41,10 +41,10 @@ public class AES {
 			testText[i] = (byte) (i * 5);
 		AES test = new AES(testText);
 		System.out.println("192 bit Key Example: " + test.keyToString());
-		//print2DArray(test.state);
-		//print2DArray(test.rCon);
+		print2DArray(test.state);
+		print2DArray(test.rCon);
 		print2DArray(test.sBox);
-		//print2DArray(test.iSBox);
+		print2DArray(test.iSBox);
 		test.subWord(test.sBox);
 	}
 
