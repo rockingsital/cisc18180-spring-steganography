@@ -69,11 +69,12 @@ public class EncodeAndDecode{
 					encodedImage.setRGB(minX + j,minY + i,
 							changeColor(new Color(encodedImage.
 							getRGB((minX + j),(minY + i))
-							),message.charAt((j * width) + i))
+							),message.charAt((j * width) + i - 1))
 							.getRGB());
 					/* Changes the Color of the current pixel
 				   	so that a character of the message is
-				   	held within it. */
+				   	held within it. -1 accounts for the starting code
+				   	indicating the image holds text. */
 				}
 			}
 		}
