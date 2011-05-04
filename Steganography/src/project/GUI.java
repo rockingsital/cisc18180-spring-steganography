@@ -1,26 +1,32 @@
 package project;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 public class GUI extends JPanel implements ActionListener{
 	
 	JTextField pictureLocation, password, desiredLocation;
-	JComponent pictureDisplay;
 	static JFrame frame;
+	SpringLayout layout;
 	static int textFieldHeight, textFieldWidth;
 	
 	public GUI(){
 
-		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		layout = new SpringLayout();
+		setLayout(layout);
 		JPanel panel = new JPanel();
-		panel.add(createInformationField());
-		panel.add(createButton());
+		JComponent infoField = createInformationField();
+		JComponent buttonField = createButton();
+		panel.add(infoField);
+		panel.add(buttonField);
+		layout.putConstraint(SpringLayout.WEST, infoField, 5, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.NORTH, infoField, 5, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, buttonField, 5, SpringLayout.EAST, infoField);
+		layout.putConstraint(SpringLayout.NORTH, buttonField, 30, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, buttonField);
+		layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, infoField);
 		add(panel);
 		
 	}
@@ -82,16 +88,21 @@ public class GUI extends JPanel implements ActionListener{
 		}
 	
 	public void resize(ImagePanel imgPanel){
-		
-		if (imgPanel.image.getHeight() > textFieldHeight){
-			frame.setSize(textFieldWidth + imgPanel.image.getWidth() + 300,
-					textFieldHeight + imgPanel.image.getHeight());
+
+		layout.putConstraint(SpringLayout.NORTH, imgPanel, textFieldHeight, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, imgPanel, 5, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, imgPanel);
+		layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, imgPanel);
+		if (imgPanel.image.getWidth() > textFieldWidth){
+			frame.setSize(imgPanel.image.getWidth() + 5,
+					textFieldHeight + imgPanel.image.getHeight() + 5);
 		}
 		else{
-			frame.setSize(textFieldWidth + imgPanel.image.getWidth() + 300,
-					textFieldHeight);
+			frame.setSize(textFieldWidth,
+					textFieldHeight + imgPanel.image.getHeight() + 5);
 		}
 		this.updateUI();
+
 	}
 	
 	public static void createAndShowGUI(){
