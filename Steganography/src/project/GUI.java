@@ -12,6 +12,8 @@ public class GUI extends JPanel implements ActionListener{
 	
 	JTextField pictureLocation, password, desiredLocation;
 	JComponent pictureDisplay;
+	static JFrame frame;
+	static int textFieldHeight, textFieldWidth;
 	
 	public GUI(){
 
@@ -81,21 +83,26 @@ public class GUI extends JPanel implements ActionListener{
 	
 	public void resize(ImagePanel imgPanel){
 		
-		System.out.println(this.getWidth());
-		this.setSize(this.getWidth()+imgPanel.image.getWidth(),
-						this.getHeight()+imgPanel.image.getHeight());
-		System.out.println(this.getWidth());
+		if (imgPanel.image.getHeight() > textFieldHeight){
+			frame.setSize(textFieldWidth + imgPanel.image.getWidth() + 300,
+					textFieldHeight + imgPanel.image.getHeight());
+		}
+		else{
+			frame.setSize(textFieldWidth + imgPanel.image.getWidth() + 300,
+					textFieldHeight);
+		}
 		this.updateUI();
-		this.setPreferredSize(new Dimension(200,150));
 	}
 	
 	public static void createAndShowGUI(){
 		
-		JFrame frame = new JFrame("Steganography");
+		frame = new JFrame("Steganography");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new GUI());
         frame.pack();
         frame.setVisible(true);
+		textFieldWidth = frame.getWidth();
+		textFieldHeight = frame.getHeight();
 	}
 	
 	/**
