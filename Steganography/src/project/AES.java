@@ -19,6 +19,7 @@ public class AES {
 	int round; //Used to represent what round the encryption algorithms is on (will be 12 in the end)
 	static final int blockSize = 4; //In Words (128 bits, 16 bytes)
 	static final int keySize = 6; //In Words (192 bits, 24 bytes)
+	static final int numberOfRounds = 12;
 
 	public AES(byte[] input){
 		key = generateKey();
@@ -32,7 +33,7 @@ public class AES {
 		rCon = buildRCon();
 		sBox = buildSBox();
 		iSBox = buildISBox();
-		//w = keyExpansion(key);
+		w = keyExpansion(key);
 	}
 
 	public static void main(String[] args){
@@ -41,11 +42,11 @@ public class AES {
 			testText[i] = (byte) (i * 5);
 		AES test = new AES(testText);
 		System.out.println("192 bit Key Example: " + test.keyToString());
-		print2DArray(test.state);
-		print2DArray(test.rCon);
-		print2DArray(test.sBox);
-		print2DArray(test.iSBox);
-		test.subWord(test.sBox);
+		TwoDimensionalArray.print(test.state);
+		TwoDimensionalArray.print(test.rCon);
+		TwoDimensionalArray.print(test.sBox);
+		TwoDimensionalArray.print(test.iSBox);
+		TwoDimensionalArray.print(test.w);
 	}
 
 	public byte[] generateKey(){
@@ -72,60 +73,38 @@ public class AES {
 		return output;
 	}
 
-	public static void print2DArray(byte[][] input){
-		System.out.print("   | ");
-		for(int i = 0; i < input[0].length; i++)
-			System.out.print(i + spacer2(i) + "| ");
-		System.out.println();
-		System.out.print("---");
-		for(int i = 0; i < input[0].length; i++)
-			System.out.print("-------");
-		System.out.println();
-		for(int i = 0; i < input.length; i++){
-			System.out.print(i + spacer(i + 90) + "| ");
-			for(int j = 0; j < input[i].length; j++){
-				System.out.print(input[i][j] + spacer2(input[i][j]) + "| ");
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-
-	public static String spacer(int input){
-		if (Math.abs(input) >= 0 && Math.abs(input) <= 9)
-			return "   ";
-		else if(Math.abs(input) >= 10 && Math.abs(input) <= 99)
-			return "  ";
-		else
-			return " ";
-	}
-	
-	public static String spacer2(int input){
-		if (input >= 0 && input <= 9)
-			return "    ";
-		else if(input >= 10 && input <= 99)
-			return "   ";
-		else if(input >= 100)
-			return "  ";
-		else if(input <= -1 && input >= -9)
-			return "   ";
-		else if(input <= -10 && input >= -99)
-			return "  ";
-		else
-			return " ";
-	}
-	/**
+	//Takes your initial 6 row key and expands it into
+	//a 52 row key that is used for the encryption
 	public byte[][] keyExpansion(byte[] key){
-		byte[][] output = new byte[6][4];
+		byte[][] output = new byte[52][4];
 		//Put key into the top of the output
 		for (int row = 0; row < 6; row++){
 			for (int col = 0; col < 4; col++){
 				output[row][col] = key[(row * 4) + col];
 			}
 		}
-		//Generate the rest using the previous two rows
+		//Generate the rest using the existing key
+		byte[] temp = new byte[4];
+		//Loop set to run for 46 times (52-6)
+		for (int row = keySize; row < blockSize * (numberOfRounds+1); ++row){
+			//Set temp equal to the previously generate row
+			for(int i = 0; i < 4; i++){
+				temp[i] = output[row-1][i];
+			}
+			//Every 6th row, rotWord, subWord then XOR with a value from the rCon
+			if (row % keySize == 0){
+				temp = subWord(rotWord(temp));
+				for(int i = 0; i < 4; i++){
+					temp[i] = (byte)( (int)temp[i] ^ (int)rCon[row/keySize][i] );
+				}
+			}
+			//Then take the row 6 rows up and XOR it with the row currently being generated
+			for(int i = 0; i < 4; i++){
+				output[row][i] = (byte) ((int)output[row-keySize][i] ^ (int)temp[i] );
+			}
+		}
+		return output;
 	}
-	 */
 
 	/**
 	public byte[] encrypt(){
@@ -154,38 +133,36 @@ public class AES {
 		return output;
 	}
 
-	public void rotWord(byte[] input){
+	public byte[] rotWord(byte[] input){
 		byte tmp = input[0];
 		input[0] = input[1];
 		input[1] = input[2];
 		input[2] = input[3];
 		input[3] = tmp;
+		return input;
 	}
 
-	public byte[][] subWord(byte[][] input){
-		byte[][] output = new byte[input.length][input[0].length];
+	public byte[] subWord(byte[] input){
+		byte[] output = new byte[input.length];
 		Integer hexInt;
 		String hexString;
 		char sRow;
 		char sCol;
 		for (int row = 0; row < input.length; row = row + 1){
-			for (int col = 0; col < input[row].length; col = col + 1){
-				hexInt = (input[row][col] & 0xff);
-				hexString = Integer.toHexString(hexInt);
-				if (hexString.length() == 1){
-					sRow = '0';
-					sCol = hexString.charAt(0);
-				}
-				else{
-					sRow = hexString.charAt(0);
-					sCol = hexString.charAt(1);
-				}
-				try {
-					output[row][col] = sBox[char2Hex(sRow)][char2Hex(sCol)];
-				} catch (SteveCodedThisException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			hexInt = (input[row] & 0xff);
+			hexString = Integer.toHexString(hexInt);
+			if (hexString.length() == 1){
+				sRow = '0';
+				sCol = hexString.charAt(0);
+			}
+			else{
+				sRow = hexString.charAt(0);
+				sCol = hexString.charAt(1);
+			}
+			try {
+				output[row] = sBox[char2Hex(sRow)][char2Hex(sCol)];
+			} catch (SteveCodedThisException e) {
+				e.printStackTrace();
 			}
 		}
 		return output;
