@@ -28,8 +28,16 @@ public class EncodeAndDecode{
 			return encodedImage;
 		}
 		/* Needs to deal with message input??? */
-		String message = " I thought you would like to know that I've finished encoding and decoding for text. It's messy and there are some design questions to address, but it mostly works.";
-		/* Concerned about expanding image???*/
+		String message = "Computer Science is fun. ";
+		int scaleFactor = 1;
+		while((message.length()) > (scaleFactor * scaleFactor * encodedImage.getHeight() * encodedImage.getWidth())){
+			scaleFactor += 1;
+		}
+		/* Determines the scaleFactor needed to fit all the
+		   information from the message into the
+		   image without changing its appearance.
+		   i.e. the image must have as many pixels as the
+		   message has characters. */
 		int minX = encodedImage.getMinX();
 		int minY = encodedImage.getMinY();
 		int width = encodedImage.getWidth();
@@ -41,10 +49,11 @@ public class EncodeAndDecode{
 			   horizontally. */
 			/* Too Long Lines ??? */
 			for (int i = 0; ((((j * height) + i) <= 
-					message.length()) && (i < height)); 
+					message.length() + 1) && (i < height)); 
 					i += 1){
 				/* Controls movement through the image 
-				   vertically. */
+				   vertically. + 1 accounts for presence of
+				   start up and end codes. */
 				if (i == 0 && j == 0){
 					encodedImage.setRGB(minX + j,minY + i,
 							changeColor(new Color(encodedImage.
@@ -55,14 +64,14 @@ public class EncodeAndDecode{
 					   within it. */
 					/* Text Code??? */
 				}
-				else if ((j * height) + i == message.length()){
+				else if ((j * height) + i == message.length() + 1){
 					encodedImage.setRGB(minX + j,minY + i,
 							changeColor(new Color(encodedImage.
 							getRGB((minX + j),(minY + i))
 							),423).getRGB());
 					/* Places 423 in the current pixel of the
 					   image to indicate the end of the message
-					   has been reached. */
+					   has been reached. + 1 accounts for start up code. */
 					/* End Code??? */
 				}
 				else{
@@ -128,6 +137,31 @@ public class EncodeAndDecode{
 			}
 		}
 		return message;
+		
+	}
+	
+	public static BufferedImage scaleUp(BufferedImage original,int scaleFactor){
+		
+		/* Increases the number of pixels in the given image
+		 * by the given factor.
+		 */
+		
+		BufferedImage scaledUp = new BufferedImage(original.getWidth() * scaleFactor,original.getHeight() * scaleFactor, BufferedImage.TYPE_INT_RGB);
+		for (int i = 0; i < original.getHeight(); i += 1){
+			/* Controls vertical movement through the image. */
+			for (int j = 0; j < original.getWidth(); j += 1){
+				/* Controls horizontal movement through the image. */
+				for (int k = 0; k < scaleFactor; k += 1){
+					for (int l = 0; l < scaleFactor; l += 1){
+						scaledUp.setRGB((j*scaleFactor)+k,(i*scaleFactor)+l,original.getRGB(j,i));
+					}
+				}
+				/* Converts a scaleFactor x scaleFactor 
+				   area of pixels in the new image to match 
+				   a single pixel in the original image. */
+			}
+		}
+		return scaledUp;
 		
 	}
 	
@@ -294,13 +328,12 @@ public class EncodeAndDecode{
 	
 	public static void main(String[] args){
 		
-		/*
-	    JFrame frame = new JFrame("Drawing Frame");
+		JFrame frame = new JFrame("Drawing Frame");
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    MyCanvas canvas = new MyCanvas();
 	    frame.getContentPane().add(canvas);
 	    frame.setSize(1000,1000);
-	    frame.setVisible(true);*/
+	    frame.setVisible(true);
 	    System.out.println(EncodeAndDecode.decodeText());
 		
 	}
