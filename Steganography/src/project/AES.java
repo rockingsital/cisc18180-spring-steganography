@@ -39,14 +39,37 @@ public class AES {
 	public static void main(String[] args){
 		byte[] testText = new byte[16];
 		for (int i = 0; i < testText.length; i++)
-			testText[i] = (byte) (i * 5);
+			testText[i] = (byte) ((i+2) * 5);
+		long startTime = System.currentTimeMillis();
 		AES test = new AES(testText);
-		System.out.println("192 bit Key Example: " + test.keyToString());
-		TwoDimensionalArray.print(test.state);
+		System.out.println(System.currentTimeMillis() - startTime);
+		
+		System.out.println("192 bit Key Example: " + arrayToString(test.key));
+		//TwoDimensionalArray.print(test.state);
+		byte[] temp = new byte[16];
+		for(int row = 0; row < 4; row++){
+			for(int col = 0; col < 4; col++){
+				temp[(row * 4) + col] = test.state[row][col];
+			}
+		}
+		System.out.println(arrayToString(temp));
+		test.encrypt();
+		/**
 		TwoDimensionalArray.print(test.rCon);
 		TwoDimensionalArray.print(test.sBox);
 		TwoDimensionalArray.print(test.iSBox);
 		TwoDimensionalArray.print(test.w);
+		TwoDimensionalArray.print(test.state);
+		test.shiftRows();
+		**/
+		//TwoDimensionalArray.print(test.state);
+		temp = new byte[16];
+		for(int row = 0; row < 4; row++){
+			for(int col = 0; col < 4; col++){
+				temp[(row * 4) + col] = test.state[row][col];
+			}
+		}
+		System.out.println(arrayToString(temp));
 	}
 
 	public byte[] generateKey(){
@@ -66,10 +89,10 @@ public class AES {
 		return encoded;
 	}
 
-	public String keyToString(){
+	public static String arrayToString(byte[] input){
 		//create a BigInteger (from the byte[]) then turn it into a string with a radix of 16 (base 16)
 		//this means that 0-9 are used to represent 0-9 and a,b,c,d,e,f are used to represent 10-15
-		String output = new BigInteger(1, key).toString(16);
+		String output = new BigInteger(1, input).toString(16);
 		return output;
 	}
 
@@ -106,11 +129,20 @@ public class AES {
 		return output;
 	}
 
-	/**
-	public byte[] encrypt(){
-
+	
+	public void encrypt(){
+		addRoundKey(0);
+		for (int round = 1; round <= (numberOfRounds - 1); ++round){
+			subBytes(); 
+			shiftRows();  
+			mixColumns(); 
+			addRoundKey(round);
+		}  
+		subBytes();
+		shiftRows();
+		addRoundKey(numberOfRounds);
 	}
-	 */
+	 
 
 	public static byte[][] buildRCon(){
 		byte[][] output = new byte[11][4];
@@ -189,10 +221,102 @@ public class AES {
 			default: throw new SteveCodedThisException();
 		}
 	}
-
+	
+	//Take a value from the state table and XOR it with the inverse
+	//value from the w table.  If you get state[4][1] you would XOR
+	//that with w[1][4]. You flip the row and column for the w table.
 	public void addRoundKey(int round){
-
+		for(int row = 0; row < 4; row++){
+			for(int column = 0; column < 4; column++){
+				state[row][column] = (byte) ((int)state[row][column] ^ (int)w[column][row]);
+			}
+		}
 	}
+	
+	public void subBytes(){
+		Integer hexInt;
+		String hexString;
+		char sRow;
+		char sCol;
+		for (int row = 0; row < 4; row++){
+			for (int col = 0; col < 4; col++){
+				hexInt = (state[row][col] & 0xff);
+				hexString = Integer.toHexString(hexInt);
+				if (hexString.length() == 1){
+					sRow = '0';
+					sCol = hexString.charAt(0);
+				}
+				else{
+					sRow = hexString.charAt(0);
+					sCol = hexString.charAt(1);
+				}
+				try {
+					state[row][col] = sBox[char2Hex(sRow)][char2Hex(sCol)];
+				} catch (SteveCodedThisException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public void shiftRows(){
+		byte[] temp = new byte[4];
+		for(int row = 1; row < 4; row++){
+			for (int col = 0; col < 4; col++)
+				temp[col] = state[row][col];
+			for (int col = 0; col < 4; col++){
+				state[row][(col + 4 - row) % 4] = temp[col];
+			}
+		}
+	}
+	
+	private void mixColumns()
+	{
+	  byte[][] temp = new byte[4][4];
+	  for (int row = 0; row < 4; row++)  
+	  {
+	    for (int col = 0; col < 4; col++)
+	    {
+	      temp[row][col] = this.state[row][col];
+	    }
+	  }
+	      
+	  for (int col = 0; col < 4; col++)
+	  {
+	    this.state[0][col] = (byte) (mul(2,(int)temp[0][col]) ^
+	                               mul(3,(int)temp[1][col]) ^
+	                               mul(1,(int)temp[2][col]) ^
+	                               mul(1,(int)temp[3][col]) );
+
+	    this.state[1][col] = (byte) (mul(1,(int)temp[0][col]) ^
+	                               mul(2,(int)temp[1][col]) ^
+	                               mul(3,(int)temp[2][col]) ^
+	                               mul(1,(int)temp[3][col]) );
+
+	    this.state[2][col] = (byte) (mul(1,(int)temp[0][col]) ^
+	                               mul(1,(int)temp[1][col]) ^
+	                               mul(2,(int)temp[2][col]) ^
+	                               mul(3,(int)temp[3][col]) );
+
+	    this.state[3][col] = (byte) (mul(3,(int)temp[0][col]) ^
+	                               mul(1,(int)temp[1][col]) ^
+	                               mul(1,(int)temp[2][col]) ^
+	                               mul(2,(int)temp[3][col]) );
+	    }
+	  }
+	
+	public static int mul(int a, int b) {
+		   int p = 0;
+		   for (int n=0; n<8; n++) {
+		      p = ((b & 0x01) > 0) ? p^a : p;
+		      boolean ho = ((a & 0x80) > 0);
+		      a = ((a<<1) & 0xFE);
+		      if (ho)
+		         a = a ^ 0x1b;
+		      b = ((b>>1) & 0x7F);
+		   }
+		   return p;
+		}
 	
 	public byte[][] buildSBox(){
 		byte[][] output = new byte[16][16];
