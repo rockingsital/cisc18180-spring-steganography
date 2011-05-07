@@ -2,6 +2,17 @@ package project;
 
 public class SBoxes {
 	
+	public void multiplicativeInverse(byte s, byte x){
+		if((s >> 7) == 1){
+			s = (byte) (s << 1);
+			s = (byte) (s + 1);
+		}
+		else{
+			s = (byte) (s << 1);
+		}
+	}
+	
+	
 	public static byte[][] buildSBox(){
 		byte[][] output = new byte[16][16];
 		output[0][0]	=(byte)0x63;
