@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+@SuppressWarnings("serial")
 public class GUI extends JPanel implements ActionListener{
 	
 	JTextField pictureLocation, password, secret,desiredLocation;
@@ -118,10 +119,10 @@ public class GUI extends JPanel implements ActionListener{
 				this.resize(imgPanel);
 			}
 			else if (secretInfo.contentEquals("")){
-				//Decode!
+				EncodeAndDecode.decode(fromFile, toFile, pass);
 			}
 			else{
-				System.out.println("Please enter either a password or you secret information.");
+				System.out.println("Please enter EITHER a password OR your secret information.");
 			}
 		}
 		return;
