@@ -90,9 +90,9 @@ public class AES {
 	}
 
 	public static String arrayToString(byte[] input){
-		//create a BigInteger (from the byte[]) then turn it into a string with a radix of 16 (base 16)
-		//this means that 0-9 are used to represent 0-9 and a,b,c,d,e,f are used to represent 10-15
-		String output = new BigInteger(1, input).toString(16);
+		String output = "";
+		for(byte b: input)
+			output = output + byte2Hex(b);
 		return output;
 	}
 
@@ -199,6 +199,17 @@ public class AES {
 		}
 		return output;
 	}
+	
+	public static String byte2Hex(byte input){
+		Integer hexInt = (input & 0xff);
+		String hexString = Integer.toHexString(hexInt);
+		if (hexString.length() == 1){
+			return "0" + hexString;
+		}
+		else
+			return hexString;
+	}
+	
 	
 	public static int char2Hex(char input) throws SteveCodedThisException{
 		switch (input){
