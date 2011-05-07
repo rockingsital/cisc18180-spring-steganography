@@ -54,6 +54,8 @@ public class AES {
 		**/
 		//TwoDimensionalArray.print(test.state);
 		System.out.println(arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		test.decrypt();
+		System.out.println(arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 	}
 
 	public byte[] generateKey(){
@@ -82,6 +84,7 @@ public class AES {
 
 	//Takes your initial 6 row key and expands it into
 	//a 52 row key that is used for the encryption
+	
 	public byte[][] keyExpansion(byte[] key){
 		byte[][] output = new byte[52][4];
 		//Put key into the top of the output
@@ -192,7 +195,7 @@ public class AES {
 	public void addRoundKey(int round){
 		for(int row = 0; row < 4; row++){
 			for(int column = 0; column < 4; column++){
-				state[row][column] = (byte) ((int)state[row][column] ^ (int)w[column][row]);
+				state[row][column] = (byte) ((int)state[row][column] ^ (int)w[column + (round*4)][row]);
 			}
 		}
 	}
@@ -226,8 +229,7 @@ public class AES {
 	public void shiftRows(){
 		byte[] temp = new byte[4];
 		for(int row = 1; row < 4; row++){
-			for (int col = 0; col < 4; col++)
-				temp[col] = state[row][col];
+			temp = state[row];
 			for (int col = 0; col < 4; col++){
 				state[row][(col + 4 - row) % 4] = temp[col];
 			}
@@ -281,4 +283,91 @@ public class AES {
 		   }
 		   return p;
 		}
+	
+	public void decrypt(){
+		
+		addRoundKey(numberOfRounds);
+		for (int round = numberOfRounds - 1; round > 0; --round){
+			inverseShiftRows();  
+			inverseSubBytes(); 
+			addRoundKey(round);
+			inverseMixCols(); 
+		}  
+		inverseShiftRows();
+		inverseSubBytes();
+		addRoundKey(0);
+	}
+	
+	public void inverseShiftRows(){
+		
+		byte[] temp = new byte[4];
+		for(int row = 1; row < 4; row++){
+			temp = state[row];
+			for (int col = 0; col < 4; col++){
+				state[row][(col + 4 + row) % 4] = temp[col];
+			}
+		}
+	}
+	
+	public void inverseSubBytes(){
+		
+		Integer hexInt;
+		String hexString;
+		char sRow;
+		char sCol;
+		for (int row = 0; row < 4; row++){
+			for (int col = 0; col < 4; col++){
+				hexInt = (state[row][col] & 0xff);
+				hexString = Integer.toHexString(hexInt);
+				if (hexString.length() == 1){
+					sRow = '0';
+					sCol = hexString.charAt(0);
+				}
+				else{
+					sRow = hexString.charAt(0);
+					sCol = hexString.charAt(1);
+				}
+				try {
+					state[row][col] = iSBox[Hexidecimal.char2Hex(sRow)][Hexidecimal.char2Hex(sCol)];
+				} catch (SteveCodedThisException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public void inverseMixCols(){
+		
+		byte[][] temp = new byte[4][4];
+		  for (int row = 0; row < 4; row++)  
+		  {
+		    for (int col = 0; col < 4; col++)
+		    {
+		      temp[row][col] = this.state[row][col];
+		    }
+		  }
+		  
+		  for (int col = 0; col < 4; col++)
+		  {
+		    this.state[0][col] = (byte) (fieldMultiply(9,(int)temp[0][col]) ^
+		                               fieldMultiply(11,(int)temp[1][col]) ^
+		                               fieldMultiply(13,(int)temp[2][col]) ^
+		                               fieldMultiply(14,(int)temp[3][col]) );
+
+		    this.state[1][col] = (byte) (fieldMultiply(14,(int)temp[0][col]) ^
+		                               fieldMultiply(9,(int)temp[1][col]) ^
+		                               fieldMultiply(11,(int)temp[2][col]) ^
+		                               fieldMultiply(13,(int)temp[3][col]) );
+
+		    this.state[2][col] = (byte) (fieldMultiply(13,(int)temp[0][col]) ^
+		                               fieldMultiply(14,(int)temp[1][col]) ^
+		                               fieldMultiply(9,(int)temp[2][col]) ^
+		                               fieldMultiply(11,(int)temp[3][col]) );
+
+		    this.state[3][col] = (byte) (fieldMultiply(11,(int)temp[0][col]) ^
+		                               fieldMultiply(13,(int)temp[1][col]) ^
+		                               fieldMultiply(14,(int)temp[2][col]) ^
+		                               fieldMultiply(9,(int)temp[3][col]) );
+		    }
+	}
 }
