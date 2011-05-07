@@ -109,7 +109,7 @@ public class GUI extends JPanel implements ActionListener{
 			}
 			else if (pass.contentEquals("")){
 				if (isPicture(secretInfo)){
-					//Encode Picture
+					EncodeAndDecode.encodePicture(fromFile, toFile, secretInfo);
 				}
 				else{
 					EncodeAndDecode.encodeText(fromFile, toFile, secretInfo);
