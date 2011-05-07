@@ -275,9 +275,9 @@ public class AES {
 		   int p = 0;
 		   for (int n=0; n<8; n++) {
 		      p = ((b & 0x01) > 0) ? p^a : p;
-		      boolean ho = ((a & 0x80) > 0);
+		      boolean kyle = ((a & 0x80) > 0); //Is the first binary digit one?
 		      a = ((a<<1) & 0xFE);
-		      if (ho)
+		      if (kyle)
 		         a = a ^ 0x1b;
 		      b = ((b>>1) & 0x7F);
 		   }
