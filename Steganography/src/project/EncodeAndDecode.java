@@ -1,14 +1,11 @@
 package project;
+
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
-import java.io.IOException;
 import java.io.File;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import javax.swing.JFrame;
-import javax.swing.JComponent;
-import java.lang.Integer;
 import java.awt.Color;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 
 public class EncodeAndDecode{
 
@@ -93,21 +90,105 @@ public static void encodeText(File original,File writeTo,String message){
 		return;
 		
 	}
-	
-/* Overall decode, decide image or message ???*/
 
-	public static String decodeText(){
+	public static int[] encryption(byte[] bytes,AES anAES){
 		
-		/* Deal with start code??? */
+		/*
+		 * Prepares information to be encoded for encryption.
+		 */
+		
+		int[] encrypted = new int[bytes.length];
+		byte[] encryptedBytes = new byte[16];
+		for (int i = 0; i <= (bytes.length/16); i += 1){
+			if(i == (bytes.length/16)){
+				encryptedBytes = getPortion(bytes,(16 * i),(bytes.length % 16));
+				for (int j = (bytes.length % 16); j < (16 * (i+1)); j += 1){
+					encryptedBytes[j] = (char) ' ';
+				}
+				encryptedBytes = anAES.encrypt(encryptedBytes);
+			}
+			else{
+				encryptedBytes = anAES.encrypt(getPortion(bytes,(16 * i),(16 * (i + 1))));
+			}
+			for(int j = 0; j < 16; j += 1){
+				encrypted[(i * 16) + j] = (int) encryptedBytes[j];
+			}
+		}
+		return encrypted;
+		
+		
+	}
+
+	public static int[] getPortion(int[] original,int startIndex, int endIndex){
+		
+		/*
+		 * Returns an int[] that contains the elements of the given array from
+		 * the start index to (but not including) the end index.
+		 */
+		
+		int[] portion = new int[endIndex - startIndex];
+		for (int i = startIndex; i < endIndex; i += 1){
+			portion[i - startIndex] = original[i];
+		}
+		return portion;
+		
+	}
+	
+	public static byte[] getPortion(byte[] original,int startIndex, int endIndex){
+		
+		/*
+		 * Returns an byte[] that contains the elements of the given array from
+		 * the start index to (but not including) the end index.
+		 */
+		
+		byte[] portion = new byte[endIndex - startIndex];
+		for (int i = startIndex; i < endIndex; i += 1){
+			portion[i - startIndex] = original[i];
+		}
+		return portion;
+		
+	}
+	
+	public static void decode(File encoded, File writeTo, String password){
+		
 		BufferedImage encodedImage = null;
 		try{
-			/* Needs to deal with file input??? */
-			encodedImage = ImageIO.read(new File("interestingCorn.png"));
+			encodedImage = ImageIO.read(encoded);
 		}
 		catch(Exception e){
 			System.out.println(e);
-			return null;
+			return;
 		}
+		if (checkText(encodedImage)){
+			decodeText(encodedImage,writeTo,password);
+		}
+		else{
+			decodeImage(encodedImage,writeTo,password);
+		}
+		
+	}
+	
+	public static boolean checkText(BufferedImage encodedImage){
+		
+		/*
+		 * Returns a boolean representing if a text file is encoded in the image.
+		 */
+		
+		Color pixelColor = new Color(encodedImage.getRGB(0,0));
+		if (((pixelColor.getRed() % 10) == 3) && ((pixelColor.getGreen() % 10) == 4) && ((pixelColor.getBlue() % 10) == 2)){
+			return true;
+		}
+		else{
+			return false;
+		}
+		
+	}
+
+	public static void decodeText(BufferedImage encodedImage,File writeTo,String password){
+		
+		/* Recovers the message from the given image and writes it to the desired
+		   file location. */
+		
 		String message = "";
 		int minX = encodedImage.getMinX();
 		int minY = encodedImage.getMinY();
@@ -133,7 +214,15 @@ public static void encodeText(File original,File writeTo,String message){
 					String nextCharacter = getText(new Color(encodedImage.
 							getRGB((minX + j),(minY + i))));
 					if (nextCharacter.equals("done")){
-						return message;
+						try{
+							BufferedWriter output = new BufferedWriter(new FileWriter(writeTo));
+							output.write(message);
+							output.close();
+						}
+						catch (Exception e){
+							System.out.println(e);
+						}
+						return;
 					}
 					else{
 						message = message.concat(nextCharacter);
@@ -141,7 +230,7 @@ public static void encodeText(File original,File writeTo,String message){
 				}
 			}
 		}
-		return message;
+		return;
 		
 	}
 	
