@@ -12,7 +12,7 @@ import java.awt.Color;
 
 public class EncodeAndDecode{
 
-public static BufferedImage encodeText(File original,String message){
+public static void encodeText(File original,File writeTo,String message){
 		
 		/*
 		 * Hides a text message in an image.
@@ -24,7 +24,7 @@ public static BufferedImage encodeText(File original,String message){
 		}
 		catch(Exception e){
 			System.out.println(e);
-			return encodedImage;
+			return;
 		}
 		int scaleFactor = 1;
 		while((message.length()) > (scaleFactor * scaleFactor * encodedImage.getHeight() * encodedImage.getWidth())){
@@ -70,7 +70,13 @@ public static BufferedImage encodeText(File original,String message){
 					   has been reached. + 1 accounts for start 
 					   up code. */
 					/* End Code??? */
-					return encodedImage;
+					try{
+						ImageIO.write(encodedImage,"png",writeTo);
+					}
+					catch (Exception e){
+						System.out.println(e);
+					}
+					return;
 				}
 				else{
 					encodedImage.setRGB(minX + j,minY + i,
@@ -84,10 +90,12 @@ public static BufferedImage encodeText(File original,String message){
 				}
 			}
 		}
-		return encodedImage;
+		return;
 		
 	}
 	
+/* Overall decode, decide image or message ???*/
+
 	public static String decodeText(){
 		
 		/* Deal with start code??? */
@@ -320,36 +328,6 @@ public static BufferedImage encodeText(File original,String message){
 		   The third integer in the array represents the digit
 		   in the ones place of the final integer. */
 		return (digits[0] * 100) + (digits[1] * 10) + digits[2];
-		
-	}
-	
-	public static void main(String[] args){
-		
-		JFrame frame = new JFrame("Drawing Frame");
-	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    MyCanvas canvas = new MyCanvas();
-	    frame.getContentPane().add(canvas);
-	    frame.setSize(1000,1000);
-	    frame.setVisible(true);
-	    System.out.println(EncodeAndDecode.decodeText());
-		
-	}
-
-}
-
-class MyCanvas extends JComponent{
-	
-	public void paint(Graphics g){
-	
-		Graphics2D g2d = (Graphics2D) g;
-		try{
-			BufferedImage test = EncodeAndDecode.encodeText();
-			g2d.drawImage(test,null,1,1);
-			ImageIO.write(test,"png",new File("interestingCorn.png"));
-		}
-		catch(Exception e){
-			System.out.println(e);
-		}
 		
 	}
 	
