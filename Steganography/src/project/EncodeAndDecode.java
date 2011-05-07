@@ -12,7 +12,7 @@ import java.awt.Color;
 
 public class EncodeAndDecode{
 
-public static BufferedImage encodeText(){
+public static BufferedImage encodeText(File original,String message){
 		
 		/*
 		 * Hides a text message in an image.
@@ -20,15 +20,12 @@ public static BufferedImage encodeText(){
 		
 		BufferedImage encodedImage = null;
 		try{
-			/* Needs to deal with file input??? */
-			encodedImage = ImageIO.read(new File("mothersDay.png"));
+			encodedImage = ImageIO.read(original);
 		}
 		catch(Exception e){
 			System.out.println(e);
 			return encodedImage;
 		}
-		/* Needs to deal with message input??? */
-		String message = "Dear Mom, I thought about sending you a regular card but instead I decided to show you what I've been working on in computer science. My group project deals with steganography. We're hiding text messages and images in other images. In this case, this message is encoded into the picture itself. Hope you like it. Have a wonderful mother's day. Thanks for all that you do.";
 		int scaleFactor = 1;
 		while((message.length()) > (scaleFactor * scaleFactor * encodedImage.getHeight() * encodedImage.getWidth())){
 			scaleFactor += 1;
