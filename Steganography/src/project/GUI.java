@@ -1,3 +1,12 @@
+/**
+ * Authors: Ron Lewis, Kyle Tucker, Steve Herbein
+ * CISC181 Spr 11 Project, Dr. Harvey, TA: Sunny Singh
+ * This file contains the class for the GUI for this project. The GUI contains four text fields and
+ * a button that allow for encoding and decoding (with encryption and decryption, respectively). The
+ * GUI is smart in the sense that it can detect whether or not the user wants to encode or decode, and
+ * then it performs the action. Once completed, it shows the final product.
+ */
+
 package project;
 
 import javax.swing.*;
@@ -7,7 +16,7 @@ import java.io.File;
 
 public class GUI extends JPanel implements ActionListener{
 	
-	JTextField pictureLocation, password, desiredLocation;
+	JTextField pictureLocation, password, secret,desiredLocation;
 	static JFrame frame;
 	SpringLayout layout;
 	static int textFieldHeight, textFieldWidth;
@@ -28,6 +37,7 @@ public class GUI extends JPanel implements ActionListener{
 		layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, buttonField);
 		layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, infoField);
 		add(panel);
+		return;
 		
 	}
 	
@@ -35,9 +45,10 @@ public class GUI extends JPanel implements ActionListener{
 		
 		JPanel panel = new JPanel(new SpringLayout());
 		String[] labelStrings = {
-				"Picture location: ",
+				"Picture location and name: ",
 				"Password: ",
-				"New picture's location: "
+				"Secret Information",
+				"Output's location and name: "
 		};
 		JLabel[] labels = new JLabel[labelStrings.length];
 		JTextField[] fields = new JTextField[labelStrings.length];
@@ -50,9 +61,13 @@ public class GUI extends JPanel implements ActionListener{
 		password.setColumns(20);
 		fields[1] = password;
 		
+		secret = new JTextField();
+		secret.setColumns(20);
+		fields[2] = secret;
+		
 		desiredLocation = new JTextField();
 		desiredLocation.setColumns(20);
-		fields[2] = desiredLocation;
+		fields[3] = desiredLocation;
 		
 		for(int count = 0; count < labelStrings.length; count = count + 1){
 			labels[count] = new JLabel(labelStrings[count], JLabel.TRAILING);
@@ -81,11 +96,42 @@ public class GUI extends JPanel implements ActionListener{
 		
 		File fromFile = new File(pictureLocation.getText());
 		String pass = password.getText();
+		String secretInfo = secret.getText();
 		File toFile = new File(desiredLocation.getText());
-		ImagePanel imgPanel = new ImagePanel(desiredLocation);
-		add(imgPanel);
-		this.resize(imgPanel);
+		if (fromFile.toString().contentEquals("") || 
+				toFile.toString().contentEquals("")){
+			System.out.println("Please fill in the appropriate fields.");
 		}
+		else{
+			if (!pass.contentEquals("") && !secretInfo.contentEquals("")){
+				System.out.println("You can't enter either ");
+			}
+			else if (pass.contentEquals("")){
+				if (isPicture(secretInfo)){
+					//Encode Picture
+				}
+				else{
+					EncodeAndDecode.encodeText(fromFile, toFile, secretInfo);
+				}
+				ImagePanel imgPanel = new ImagePanel(desiredLocation);
+				add(imgPanel);
+				this.resize(imgPanel);
+			}
+			else if (secretInfo.contentEquals("")){
+				//Decode!
+			}
+			else{
+				System.out.println("Please enter either a password or you secret information.");
+			}
+		}
+		return;
+	}
+	
+	public boolean isPicture(String secretInfo){
+		
+		return (secretInfo.charAt(0) == 'C' && secretInfo.charAt(1) == ':' && secretInfo.charAt(2) == '\\') ||
+		(secretInfo.charAt(0) == '\\');
+	}
 	
 	public void resize(ImagePanel imgPanel){
 
@@ -102,7 +148,7 @@ public class GUI extends JPanel implements ActionListener{
 					textFieldHeight + imgPanel.image.getHeight() + 5);
 		}
 		this.updateUI();
-
+		return;
 	}
 	
 	public static void createAndShowGUI(){
@@ -114,6 +160,7 @@ public class GUI extends JPanel implements ActionListener{
         frame.setVisible(true);
 		textFieldWidth = frame.getWidth();
 		textFieldHeight = frame.getHeight();
+		return;
 	}
 	
 	/**
@@ -122,6 +169,7 @@ public class GUI extends JPanel implements ActionListener{
 	public static void main(String[] args) {
 
 		createAndShowGUI();
+		return;
 	}
 
 }
