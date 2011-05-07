@@ -12,7 +12,7 @@ import java.awt.Color;
 
 public class EncodeAndDecode{
 
-	public static BufferedImage encodeText(){
+public static BufferedImage encodeText(){
 		
 		/*
 		 * Hides a text message in an image.
@@ -21,14 +21,14 @@ public class EncodeAndDecode{
 		BufferedImage encodedImage = null;
 		try{
 			/* Needs to deal with file input??? */
-			encodedImage = ImageIO.read(new File("corn.png"));
+			encodedImage = ImageIO.read(new File("mothersDay.png"));
 		}
 		catch(Exception e){
 			System.out.println(e);
 			return encodedImage;
 		}
 		/* Needs to deal with message input??? */
-		String message = "Computer Science is fun. ";
+		String message = "Dear Mom, I thought about sending you a regular card but instead I decided to show you what I've been working on in computer science. My group project deals with steganography. We're hiding text messages and images in other images. In this case, this message is encoded into the picture itself. Hope you like it. Have a wonderful mother's day. Thanks for all that you do.";
 		int scaleFactor = 1;
 		while((message.length()) > (scaleFactor * scaleFactor * encodedImage.getHeight() * encodedImage.getWidth())){
 			scaleFactor += 1;
@@ -38,22 +38,20 @@ public class EncodeAndDecode{
 		   image without changing its appearance.
 		   i.e. the image must have as many pixels as the
 		   message has characters. */
+		encodedImage = scaleUp(encodedImage,scaleFactor);
 		int minX = encodedImage.getMinX();
 		int minY = encodedImage.getMinY();
 		int width = encodedImage.getWidth();
 		int height = encodedImage.getHeight();
-		/* Properties of the image used to move through
-		   pixels of the image using a loop. */
 		for (int j = 0; j < width; j+= 1){
 			/* Controls movement through the image 
 			   horizontally. */
 			/* Too Long Lines ??? */
 			for (int i = 0; ((((j * height) + i) <= 
-					message.length() + 1) && (i < height)); 
+					message.length()+1) && (i < height)); 
 					i += 1){
 				/* Controls movement through the image 
-				   vertically. + 1 accounts for presence of
-				   start up and end codes. */
+				   vertically. */
 				if (i == 0 && j == 0){
 					encodedImage.setRGB(minX + j,minY + i,
 							changeColor(new Color(encodedImage.
@@ -61,29 +59,31 @@ public class EncodeAndDecode{
 							),342).getRGB());
 					/* Places 342 in the first pixel of the
 					   image to indicate a text message is
-					   within it. */
+					   within it. + 1 accounts for presence of
+				   	   start up and end codes. */
 					/* Text Code??? */
 				}
-				else if ((j * height) + i == message.length() + 1){
+				else if (((j * height) + i) == (message.length()+1)){
 					encodedImage.setRGB(minX + j,minY + i,
 							changeColor(new Color(encodedImage.
 							getRGB((minX + j),(minY + i))
 							),423).getRGB());
 					/* Places 423 in the current pixel of the
 					   image to indicate the end of the message
-					   has been reached. + 1 accounts for start up code. */
+					   has been reached. + 1 accounts for start 
+					   up code. */
 					/* End Code??? */
+					return encodedImage;
 				}
 				else{
 					encodedImage.setRGB(minX + j,minY + i,
 							changeColor(new Color(encodedImage.
 							getRGB((minX + j),(minY + i))
-							),message.charAt((j * width) + i - 1))
+							),message.charAt((j * height) + i - 1))
 							.getRGB());
 					/* Changes the Color of the current pixel
 				   	so that a character of the message is
-				   	held within it. -1 accounts for the starting code
-				   	indicating the image holds text. */
+				   	held within it. */
 				}
 			}
 		}
