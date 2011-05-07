@@ -91,12 +91,12 @@ public static void encodeText(File original,File writeTo,String message){
 		
 	}
 
-	public static int[] encryption(byte[] bytes,AES anAES){
-		
+/*	public static int[] encryption(byte[] bytes,AES anAES){
+		/*
 		/*
 		 * Prepares information to be encoded for encryption.
 		 */
-		
+		/*
 		int[] encrypted = new int[bytes.length];
 		byte[] encryptedBytes = new byte[16];
 		for (int i = 0; i <= (bytes.length/16); i += 1){
@@ -117,7 +117,7 @@ public static void encodeText(File original,File writeTo,String message){
 		return encrypted;
 		
 		
-	}
+	}*/
 
 	public static int[] getPortion(int[] original,int startIndex, int endIndex){
 		
@@ -163,8 +163,9 @@ public static void encodeText(File original,File writeTo,String message){
 			decodeText(encodedImage,writeTo,password);
 		}
 		else{
-			decodeImage(encodedImage,writeTo,password);
+			/*decodeImage(encodedImage,writeTo,password);*/
 		}
+		return;
 		
 	}
 	
