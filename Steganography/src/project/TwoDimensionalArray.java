@@ -3,7 +3,7 @@ package project;
 public class TwoDimensionalArray {
 
 	//Takes a 2d Byte Array and prints it out with
-	//numbered rows and coumns separated by lines
+	//numbered rows and columns separated by lines
 	public static void print(byte[][] input){
 		System.out.print("   | ");
 		for(int i = 0; i < input[0].length; i++)
