@@ -23,13 +23,14 @@ public class AesTest {
 	public void testSubWord(){
 		byte[] byteArray = new byte[4];
 		for(int count = 0; count < 4; count++){
-			byteArray[count] = (byte)(count * (10 + count)); //0, 11, 24, 39
+			byteArray[count] = (byte)(count * (10 + count)); //0, b, 18, 27 (0, 11, 24, 39)
 		}
 		AES test = new AES(new byte[16]);
 		byte[] newArray = test.subWord(byteArray);
-		assertTrue("SubWord 0", newArray[0] == 99); //0x
-		assertTrue("SubWord 1", newArray[1] == -126); //0x
-		assertTrue("SubWord 2", newArray[2] == 54); //0x
-		assertTrue("SubWord 3", newArray[3] == 18); //0x
+		assertTrue("SubWord 0", newArray[0] == 99);
+		assertTrue("SubWord 1", newArray[1] == 43);
+		assertTrue("SubWord 2", newArray[2] == -83);
+		assertTrue("SubWord 3", newArray[3] == -52);
 	}
+
 }
