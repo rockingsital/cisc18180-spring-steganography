@@ -39,24 +39,25 @@ public class AES {
 		long startTime = System.currentTimeMillis();
 		AES test = new AES(testText);
 		System.out.println(System.currentTimeMillis() - startTime);
-		
 		System.out.println("192 bit Key Example: " + arrayToString(test.key));
 		//TwoDimensionalArray.print(test.state);
-		System.out.println(arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		System.out.println("Input State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 		test.encrypt();
+		System.out.println("rCon");
 		TwoDimensionalArray.print(test.rCon);
+		System.out.println("sBox");
 		TwoDimensionalArray.print(test.sBox);
+		System.out.println("iSBox");
 		TwoDimensionalArray.print(test.iSBox);
+		System.out.println("Key Expansion");
 		TwoDimensionalArray.print(test.w);
-		TwoDimensionalArray.print(test.state);
-		test.shiftRows();
-		//TwoDimensionalArray.print(test.state);
-		System.out.println(arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		System.out.println("Encrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 		test.decrypt();
-		System.out.println(arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		System.out.println("Decrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 	}
 
 	public byte[] generateKey(){
+		/**
 		KeyGenerator kgen = null;
 		try {
 			//Use AES encryption
@@ -71,6 +72,12 @@ public class AES {
 		//Put that key in a byte[]
 		byte [] encoded = aeskey.getEncoded();
 		return encoded;
+		**/
+		String key = "6ea013aa065fd44347c2b9371bdb2df31c66770409c7ac40";
+		byte[] output = new byte[24];
+		for (int i = 0; i < 48; i = i + 2)
+			output[i/2] = (byte) ((Character.digit(key.charAt(i), 16) << 4) + Character.digit(key.charAt(i+1), 16));
+		return output;
 	}
 
 	public static String arrayToString(byte[] input){
@@ -131,20 +138,20 @@ public class AES {
 
 	public static byte[][] buildRCon(){
 		byte[][] output = new byte[11][4];
-		output[0][0] = 0;
-		output[1][0] = 1;
-		output[2][0] = 2;
-		output[3][0] = 4;
-		output[4][0] = 8;
-		output[5][0] = 16;
-		output[6][0] = 32;
-		output[7][0] = 64;
-		output[8][0] = -128;
-		output[9][0] = 27;
-		output[10][0] = 54;
+		output[0][0] = (byte) 0x00;
+		output[1][0] = (byte) 0x01;
+		output[2][0] = (byte) 0x02;
+		output[3][0] = (byte) 0x04;
+		output[4][0] = (byte) 0x08;
+		output[5][0] = (byte) 0x10;
+		output[6][0] = (byte) 0x20;
+		output[7][0] = (byte) 0x40;
+		output[8][0] = (byte) 0x80;
+		output[9][0] = (byte) 0x1b;
+		output[10][0] = (byte) 0x36;
 		for (int row = 0; row < 11; row = row + 1){
 			for (int col = 1; col < 4; col = col + 1){
-				output[row][col] = 0;
+				output[row][col] = (byte) 0x00;
 			}
 		}
 		return output;
@@ -165,8 +172,8 @@ public class AES {
 		String hexString;
 		char sRow;
 		char sCol;
-		for (int row = 0; row < input.length; row = row + 1){
-			hexInt = (input[row] & 0xff);
+		for (int col = 0; col < input.length; col = col + 1){
+			hexInt = (input[col] & 0xff);
 			hexString = Integer.toHexString(hexInt);
 			if (hexString.length() == 1){
 				sRow = '0';
@@ -177,7 +184,7 @@ public class AES {
 				sCol = hexString.charAt(1);
 			}
 			try {
-				output[row] = sBox[Hexidecimal.char2Hex(sRow)][Hexidecimal.char2Hex(sCol)];
+				output[col] = sBox[Hexidecimal.char2Hex(sRow)][Hexidecimal.char2Hex(sCol)];
 			} catch (SteveCodedThisException e) {
 				e.printStackTrace();
 			}
