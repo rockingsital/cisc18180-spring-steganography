@@ -44,14 +44,12 @@ public class AES {
 		//TwoDimensionalArray.print(test.state);
 		System.out.println(arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 		test.encrypt();
-		/**
 		TwoDimensionalArray.print(test.rCon);
 		TwoDimensionalArray.print(test.sBox);
 		TwoDimensionalArray.print(test.iSBox);
 		TwoDimensionalArray.print(test.w);
 		TwoDimensionalArray.print(test.state);
 		test.shiftRows();
-		**/
 		//TwoDimensionalArray.print(test.state);
 		System.out.println(arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 		test.decrypt();

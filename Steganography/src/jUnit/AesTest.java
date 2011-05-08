@@ -9,15 +9,27 @@ public class AesTest {
 	@Test
 	public void testRotWord(){
 		byte[] byteArray = new byte[4];
-		AES tester = new AES(byteArray);
-		for (int count = 0; count < 4; count++){
-			byteArray[count] = (byte)(count + 1);
+		for (int count = 0; count < 4; count++)
+			byteArray[count] = (byte)(count);
+		AES test = new AES(new byte[16]);
+		byte[] newArray = test.rotWord(byteArray);
+		assertTrue("RotWord", newArray[0] == 1);
+		assertTrue("RotWord", newArray[1] == 2);
+		assertTrue("RotWord", newArray[2] == 3);
+		assertTrue("RotWord", newArray[3] == 0);	
+	}
+	
+	@Test
+	public void testSubWord(){
+		byte[] byteArray = new byte[4];
+		for(int count = 0; count < 4; count++){
+			byteArray[count] = (byte)(count * (10 + count)); //0, 11, 24, 39
 		}
-		byte[] newArray = tester.rotWord(byteArray);
-		assertTrue("Testing", newArray[0] == 2);
-		assertTrue("Testing", newArray[1] == 3);
-		assertTrue("Testing", newArray[2] == 4);
-		assertTrue("Testing", newArray[3] == 1);
-		
+		AES test = new AES(new byte[16]);
+		byte[] newArray = test.subWord(byteArray);
+		assertTrue("SubWord 0", newArray[0] == 99); //0x
+		assertTrue("SubWord 1", newArray[1] == -126); //0x
+		assertTrue("SubWord 2", newArray[2] == 54); //0x
+		assertTrue("SubWord 3", newArray[3] == 18); //0x
 	}
 }

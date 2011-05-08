@@ -1,7 +1,7 @@
 package project;
 
 public class SBoxes {
-	
+	/**
 	public void multiplicativeInverse(byte s, byte x){
 		if((s >> 7) == 1){
 			s = (byte) (s << 1);
@@ -11,7 +11,7 @@ public class SBoxes {
 			s = (byte) (s << 1);
 		}
 	}
-	
+	**/
 	
 	public static byte[][] buildSBox(){
 		byte[][] output = new byte[16][16];
