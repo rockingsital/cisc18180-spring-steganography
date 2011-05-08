@@ -33,4 +33,27 @@ public class AesTest {
 		assertTrue("SubWord 3", newArray[3] == -52);
 	}
 
+	@Test
+	public void testMixColumns(){
+		byte[][] test = new byte[4][4];
+		test[0][0]= (byte) 0xdb;
+		test[0][1]= (byte) 0x13;
+		test[0][2]= (byte) 0x53;
+		test[0][3]= (byte) 0x45;
+		test[1][0]= (byte) 0xf2;
+		test[1][1]= (byte) 0x0a;
+		test[1][2]= (byte) 0x22;
+		test[1][3]= (byte) 0x5c;
+		test[2][0]= (byte) 0x01;
+		test[2][1]= (byte) 0x01;
+		test[2][2]= (byte) 0x01;
+		test[2][3]= (byte) 0x01;
+		test[3][0]= (byte) 0xc6;
+		test[3][1]= (byte) 0xc6;
+		test[3][2]= (byte) 0xc6;
+		test[3][3]= (byte) 0xc6;
+		AES testAES = new AES(TwoDimensionalArray.toSingleArray(test));
+		testAES.inverseMixCols();
+		TwoDimensionalArray.print(testAES.state);
+	}
 }

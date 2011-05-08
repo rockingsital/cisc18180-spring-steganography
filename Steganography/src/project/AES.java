@@ -9,12 +9,13 @@ import javax.crypto.SecretKey;
 
 public class AES {
 
-	byte[][] state;
+	public byte[][] state;
 	byte[] key;
 	byte[][] w;
 	byte[][] rCon;
 	byte[][] sBox;
 	byte[][] iSBox;
+	static GaloisField galField;
 
 	int round; //Used to represent what round the encryption algorithms is on (will be 12 in the end)
 	static final int blockSize = 4; //In Words (128 bits, 16 bytes)
@@ -30,6 +31,7 @@ public class AES {
 		sBox = SBoxes.buildSBox();
 		iSBox = SBoxes.buildISBox();
 		w = keyExpansion(key);
+		galField = new GaloisField();
 	}
 
 	public static void main(String[] args){
@@ -43,6 +45,7 @@ public class AES {
 		//TwoDimensionalArray.print(test.state);
 		System.out.println("Input State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 		test.encrypt();
+		/**
 		System.out.println("rCon");
 		TwoDimensionalArray.print(test.rCon);
 		System.out.println("sBox");
@@ -52,8 +55,10 @@ public class AES {
 		System.out.println("Key Expansion");
 		TwoDimensionalArray.print(test.w);
 		System.out.println("Encrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		**/
 		test.decrypt();
 		System.out.println("Decrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		System.out.println(System.currentTimeMillis() - startTime);
 	}
 
 	public byte[] generateKey(){
@@ -72,7 +77,7 @@ public class AES {
 		//Put that key in a byte[]
 		byte [] encoded = aeskey.getEncoded();
 		return encoded;
-		**/
+		 **/
 		String key = "6ea013aa065fd44347c2b9371bdb2df31c66770409c7ac40";
 		byte[] output = new byte[24];
 		for (int i = 0; i < 48; i = i + 2)
@@ -89,7 +94,7 @@ public class AES {
 
 	//Takes your initial 6 row key and expands it into
 	//a 52 row key that is used for the encryption
-	
+
 	public byte[][] keyExpansion(byte[] key){
 		byte[][] output = new byte[52][4];
 		//Put key into the top of the output
@@ -121,7 +126,7 @@ public class AES {
 		return output;
 	}
 
-	
+
 	public void encrypt(){
 		addRoundKey(0);
 		for (int round = 1; round <= (numberOfRounds - 1); ++round){
@@ -134,7 +139,7 @@ public class AES {
 		shiftRows();
 		addRoundKey(numberOfRounds);
 	}
-	 
+
 
 	public static byte[][] buildRCon(){
 		byte[][] output = new byte[11][4];
@@ -191,9 +196,9 @@ public class AES {
 		}
 		return output;
 	}
-	
-	
-	
+
+
+
 	//Take a value from the state table and XOR it with the inverse
 	//value from the w table.  If you get state[4][1] you would XOR
 	//that with w[1][4]. You flip the row and column for the w table.
@@ -204,7 +209,7 @@ public class AES {
 			}
 		}
 	}
-	
+
 	public void subBytes(){
 		Integer hexInt;
 		String hexString;
@@ -230,7 +235,7 @@ public class AES {
 			}
 		}
 	}
-	
+
 	public void shiftRows(){
 		byte[] temp = new byte[4];
 		for(int row = 1; row < 4; row++){
@@ -240,57 +245,57 @@ public class AES {
 			}
 		}
 	}
-	
-	private void mixColumns()
+
+	public void mixColumns()
 	{
-	  byte[][] temp = new byte[4][4];
-	  for (int row = 0; row < 4; row++)  
-	  {
-	    for (int col = 0; col < 4; col++)
-	    {
-	      temp[row][col] = this.state[row][col];
-	    }
-	  }
-	      
-	  for (int col = 0; col < 4; col++)
-	  {
-	    this.state[0][col] = (byte) (fieldMultiply(2,(int)temp[0][col]) ^
-	                               fieldMultiply(3,(int)temp[1][col]) ^
-	                               fieldMultiply(1,(int)temp[2][col]) ^
-	                               fieldMultiply(1,(int)temp[3][col]) );
-
-	    this.state[1][col] = (byte) (fieldMultiply(1,(int)temp[0][col]) ^
-	                               fieldMultiply(2,(int)temp[1][col]) ^
-	                               fieldMultiply(3,(int)temp[2][col]) ^
-	                               fieldMultiply(1,(int)temp[3][col]) );
-
-	    this.state[2][col] = (byte) (fieldMultiply(1,(int)temp[0][col]) ^
-	                               fieldMultiply(1,(int)temp[1][col]) ^
-	                               fieldMultiply(2,(int)temp[2][col]) ^
-	                               fieldMultiply(3,(int)temp[3][col]) );
-
-	    this.state[3][col] = (byte) (fieldMultiply(3,(int)temp[0][col]) ^
-	                               fieldMultiply(1,(int)temp[1][col]) ^
-	                               fieldMultiply(1,(int)temp[2][col]) ^
-	                               fieldMultiply(2,(int)temp[3][col]) );
-	    }
-	  }
-	
-	public static int fieldMultiply(int a, int b) {
-		   int p = 0;
-		   for (int n=0; n<8; n++) {
-		      p = ((b & 0x01) > 0) ? p^a : p;
-		      boolean kyle = ((a & 0x80) > 0); //Is the first binary digit one?
-		      a = ((a<<1) & 0xFE);
-		      if (kyle)
-		         a = a ^ 0x1b;
-		      b = ((b>>1) & 0x7F);
-		   }
-		   return p;
+		byte[][] temp = new byte[4][4];
+		for (int row = 0; row < 4; row++)  
+		{
+			for (int col = 0; col < 4; col++)
+			{
+				temp[row][col] = this.state[row][col];
+			}
 		}
-	
+
+		for (int col = 0; col < 4; col++)
+		{
+			this.state[0][col] = (byte) (galField.mulBy2((int)temp[0][col]) ^
+					galField.mulBy3((int)temp[1][col]) ^
+					(int)((int)temp[2][col]) ^
+					(int)((int)temp[3][col]));
+
+			this.state[1][col] = (byte) ((int)((int)temp[0][col]) ^
+					galField.mulBy2((int)temp[1][col]) ^
+					galField.mulBy3((int)temp[2][col]) ^
+					(int)((int)temp[3][col]) );
+
+			this.state[2][col] = (byte) ((int)((int)temp[0][col]) ^
+					(int)((int)temp[1][col]) ^
+					galField.mulBy2((int)temp[2][col]) ^
+					galField.mulBy3((int)temp[3][col]) );
+
+			this.state[3][col] = (byte) (galField.mulBy3((int)temp[0][col]) ^
+					(int)((int)temp[1][col]) ^
+					(int)((int)temp[2][col]) ^
+					galField.mulBy2((int)temp[3][col]) );
+		}
+	}
+
+	public static int fieldMultiply(int a, int b) {
+		int p = 0;
+		for (int n=0; n<8; n++) {
+			p = ((b & 0x01) > 0) ? p^a : p;
+			boolean kyle = ((a & 0x80) > 0); //Is the first binary digit one?
+			a = ((a<<1) & 0xFE);
+			if (kyle)
+				a = a ^ 0x1b;
+			b = ((b>>1) & 0x7F);
+		}
+		return p;
+	}
+
 	public void decrypt(){
-		
+
 		addRoundKey(numberOfRounds);
 		for (int round = numberOfRounds - 1; round > 0; --round){
 			inverseShiftRows();  
@@ -302,9 +307,9 @@ public class AES {
 		inverseSubBytes();
 		addRoundKey(0);
 	}
-	
+
 	public void inverseShiftRows(){
-		
+
 		byte[] temp = new byte[4];
 		for(int row = 1; row < 4; row++){
 			temp = state[row];
@@ -313,9 +318,9 @@ public class AES {
 			}
 		}
 	}
-	
+
 	public void inverseSubBytes(){
-		
+
 		Integer hexInt;
 		String hexString;
 		char sRow;
@@ -340,39 +345,39 @@ public class AES {
 			}
 		}
 	}
-	
+
 	public void inverseMixCols(){
-		
+
 		byte[][] temp = new byte[4][4];
-		  for (int row = 0; row < 4; row++)  
-		  {
-		    for (int col = 0; col < 4; col++)
-		    {
-		      temp[row][col] = this.state[row][col];
-		    }
-		  }
-		  
-		  for (int col = 0; col < 4; col++)
-		  {
-		    this.state[0][col] = (byte) (fieldMultiply(14,(int)temp[0][col]) ^
-		                               fieldMultiply(11,(int)temp[1][col]) ^
-		                               fieldMultiply(13,(int)temp[2][col]) ^
-		                               fieldMultiply(9,(int)temp[3][col]) );
+		for (int row = 0; row < 4; row++)  
+		{
+			for (int col = 0; col < 4; col++)
+			{
+				temp[row][col] = this.state[row][col];
+			}
+		}
 
-		    this.state[1][col] = (byte) (fieldMultiply(9,(int)temp[0][col]) ^
-		                               fieldMultiply(14,(int)temp[1][col]) ^
-		                               fieldMultiply(11,(int)temp[2][col]) ^
-		                               fieldMultiply(13,(int)temp[3][col]) );
+		for (int col = 0; col < 4; col++)
+		{
+			this.state[0][col] = (byte) (galField.mulBy14((int)temp[0][col]) ^
+					galField.mulBy11((int)temp[1][col]) ^
+					galField.mulBy13((int)temp[2][col]) ^
+					galField.mulBy9((int)temp[3][col]));
 
-		    this.state[2][col] = (byte) (fieldMultiply(13,(int)temp[0][col]) ^
-		                               fieldMultiply(9,(int)temp[1][col]) ^
-		                               fieldMultiply(14,(int)temp[2][col]) ^
-		                               fieldMultiply(11,(int)temp[3][col]) );
+			this.state[1][col] = (byte) (galField.mulBy9((int)temp[0][col]) ^
+					galField.mulBy14((int)temp[1][col]) ^
+					galField.mulBy11((int)temp[2][col]) ^
+					galField.mulBy13((int)temp[3][col]) );
 
-		    this.state[3][col] = (byte) (fieldMultiply(11,(int)temp[0][col]) ^
-		                               fieldMultiply(13,(int)temp[1][col]) ^
-		                               fieldMultiply(9,(int)temp[2][col]) ^
-		                               fieldMultiply(14,(int)temp[3][col]) );
-		    }
+			this.state[2][col] = (byte) (galField.mulBy13((int)temp[0][col]) ^
+					galField.mulBy9((int)temp[1][col]) ^
+					galField.mulBy14((int)temp[2][col]) ^
+					galField.mulBy11((int)temp[3][col]) );
+
+			this.state[3][col] = (byte) (galField.mulBy11((int)temp[0][col]) ^
+					galField.mulBy13((int)temp[1][col]) ^
+					galField.mulBy9((int)temp[2][col]) ^
+					galField.mulBy14((int)temp[3][col]) );
+		}
 	}
 }
