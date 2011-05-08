@@ -175,7 +175,7 @@ public static void encodeText(File original,File writeTo,String message){
 		 * Returns a boolean representing if a text file is encoded in the image.
 		 */
 		
-		Color pixelColor = new Color(encodedImage.getRGB(0,0));
+		Color pixelColor = new Color(encodedImage.getRGB(encodedImage.getMinX(),encodedImage.getMinY()));
 		if (((pixelColor.getRed() % 10) == 3) && ((pixelColor.getGreen() % 10) == 4) && ((pixelColor.getBlue() % 10) == 2)){
 			return true;
 		}
