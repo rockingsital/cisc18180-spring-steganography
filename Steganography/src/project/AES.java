@@ -354,25 +354,25 @@ public class AES {
 		  
 		  for (int col = 0; col < 4; col++)
 		  {
-		    this.state[0][col] = (byte) (fieldMultiply(9,(int)temp[0][col]) ^
+		    this.state[0][col] = (byte) (fieldMultiply(14,(int)temp[0][col]) ^
 		                               fieldMultiply(11,(int)temp[1][col]) ^
 		                               fieldMultiply(13,(int)temp[2][col]) ^
-		                               fieldMultiply(14,(int)temp[3][col]) );
+		                               fieldMultiply(9,(int)temp[3][col]) );
 
-		    this.state[1][col] = (byte) (fieldMultiply(14,(int)temp[0][col]) ^
-		                               fieldMultiply(9,(int)temp[1][col]) ^
+		    this.state[1][col] = (byte) (fieldMultiply(9,(int)temp[0][col]) ^
+		                               fieldMultiply(14,(int)temp[1][col]) ^
 		                               fieldMultiply(11,(int)temp[2][col]) ^
 		                               fieldMultiply(13,(int)temp[3][col]) );
 
 		    this.state[2][col] = (byte) (fieldMultiply(13,(int)temp[0][col]) ^
-		                               fieldMultiply(14,(int)temp[1][col]) ^
-		                               fieldMultiply(9,(int)temp[2][col]) ^
+		                               fieldMultiply(9,(int)temp[1][col]) ^
+		                               fieldMultiply(14,(int)temp[2][col]) ^
 		                               fieldMultiply(11,(int)temp[3][col]) );
 
 		    this.state[3][col] = (byte) (fieldMultiply(11,(int)temp[0][col]) ^
 		                               fieldMultiply(13,(int)temp[1][col]) ^
-		                               fieldMultiply(14,(int)temp[2][col]) ^
-		                               fieldMultiply(9,(int)temp[3][col]) );
+		                               fieldMultiply(9,(int)temp[2][col]) ^
+		                               fieldMultiply(14,(int)temp[3][col]) );
 		    }
 	}
 }
