@@ -635,7 +635,7 @@ public static void encodeText(File original,File writeTo,String message){
 	
 	public static void main(String[] args){
 		
-		encodePicture(new File("hideImage.png"),new File("corn.png"),"encoded.png"); 
+		encodePicture(new File("hideImage.png"),new File("scoobyDoo.png"),"encoded.png"); 
 		/*
 		BufferedImage image = null;
 		try{
