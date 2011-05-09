@@ -261,22 +261,22 @@ public class AES {
 		{
 			this.state[0][col] = (byte) (galField.mulBy2((int)temp[0][col]) ^
 					galField.mulBy3((int)temp[1][col]) ^
-					(int)((int)temp[2][col]) ^
-					(int)((int)temp[3][col]));
+					((int)temp[2][col]) ^
+					((int)temp[3][col]));
 
-			this.state[1][col] = (byte) ((int)((int)temp[0][col]) ^
+			this.state[1][col] = (byte) (((int)temp[0][col]) ^
 					galField.mulBy2((int)temp[1][col]) ^
 					galField.mulBy3((int)temp[2][col]) ^
-					(int)((int)temp[3][col]) );
+					((int)temp[3][col]) );
 
-			this.state[2][col] = (byte) ((int)((int)temp[0][col]) ^
-					(int)((int)temp[1][col]) ^
+			this.state[2][col] = (byte) (((int)temp[0][col]) ^
+					((int)temp[1][col]) ^
 					galField.mulBy2((int)temp[2][col]) ^
 					galField.mulBy3((int)temp[3][col]) );
 
 			this.state[3][col] = (byte) (galField.mulBy3((int)temp[0][col]) ^
-					(int)((int)temp[1][col]) ^
-					(int)((int)temp[2][col]) ^
+					((int)temp[1][col]) ^
+					((int)temp[2][col]) ^
 					galField.mulBy2((int)temp[3][col]) );
 		}
 	}
