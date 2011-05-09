@@ -1,7 +1,5 @@
 package project;
 
-import java.math.BigInteger;
-import java.lang.Math;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.KeyGenerator;
@@ -23,29 +21,40 @@ public class AES {
 	static final int numberOfRounds = 12;
 
 	public AES(byte[] input){
-		key = generateKey();
+		key = input;
 		//Put input array of length 16 into 4x4 state array
-		state = new byte[4][4];
-		state = TwoDimensionalArray.fromSingleArray(input);
 		rCon = buildRCon();
 		sBox = SBoxes.buildSBox();
 		iSBox = SBoxes.buildISBox();
 		w = keyExpansion(key);
 		galField = new GaloisField();
 	}
-
+	
+	public AES(){
+		key = generateKey();
+		//Put input array of length 16 into 4x4 state array
+		rCon = buildRCon();
+		sBox = SBoxes.buildSBox();
+		iSBox = SBoxes.buildISBox();
+		w = keyExpansion(key);
+		galField = new GaloisField();
+	}
+	
+	public byte[] getKey(){
+		return this.key;
+	}
+	
 	public static void main(String[] args){
 		byte[] testText = new byte[16];
 		for (int i = 0; i < testText.length; i++)
 			testText[i] = (byte) ((i+3) * 5);
 		long startTime = System.currentTimeMillis();
-		AES test = new AES(testText);
+		AES test = new AES();
 		System.out.println("Time to make instance of AES: " + (System.currentTimeMillis() - startTime) + "ms");
 		System.out.println("192 bit Key: " + arrayToString(test.key));
-		//TwoDimensionalArray.print(test.state);
-		System.out.println("Input State:     " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 		startTime = System.currentTimeMillis();
-		test.encrypt();
+		System.out.println("Input State:     " + arrayToString(testText));
+		byte[] cipherText = test.encrypt(testText);
 		/**
 		System.out.println("rCon");
 		TwoDimensionalArray.print(test.rCon);
@@ -56,9 +65,8 @@ public class AES {
 		System.out.println("Key Expansion");
 		TwoDimensionalArray.print(test.w);
 		**/
-		System.out.println("Encrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
-		test.decrypt();
-		System.out.println("Decrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		System.out.println("Encrypted State: " + arrayToString(cipherText));
+		System.out.println("Decrypted State: " + arrayToString(test.decrypt(cipherText)));
 		System.out.println("Time to Encrypt and then Decrypt: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 
@@ -128,7 +136,9 @@ public class AES {
 	}
 
 
-	public void encrypt(){
+	public byte[] encrypt(byte[] input){
+		state = new byte[4][4];
+		state = TwoDimensionalArray.fromSingleArray(input);
 		addRoundKey(0);
 		for (int round = 1; round < numberOfRounds; ++round){
 			subBytes(); 
@@ -139,6 +149,7 @@ public class AES {
 		subBytes();
 		shiftRows();
 		addRoundKey(numberOfRounds);
+		return TwoDimensionalArray.toSingleArray(state);
 	}
 
 
@@ -299,8 +310,9 @@ public class AES {
 		return p;
 	}
 
-	public void decrypt(){
-
+	public byte[] decrypt(byte[] input){
+		state = new byte[4][4];
+		state = TwoDimensionalArray.fromSingleArray(input);
 		addRoundKey(numberOfRounds);
 		for (int round = numberOfRounds - 1; round > 0; --round){
 			inverseShiftRows();  
@@ -311,6 +323,7 @@ public class AES {
 		inverseShiftRows();
 		inverseSubBytes();
 		addRoundKey(0);
+		return TwoDimensionalArray.toSingleArray(state);
 	}
 
 	public void inverseShiftRows(){
