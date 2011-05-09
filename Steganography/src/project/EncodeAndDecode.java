@@ -91,6 +91,105 @@ public static void encodeText(File original,File writeTo,String message){
 		
 	}
 
+	public static void encodePicture(File hideThis,File hideIn,String writeTo){
+	
+		/*
+		 * Hides an image in another image.
+		 */
+	
+		BufferedImage imageToHide = null;
+		BufferedImage placeToHide = null;
+		try{
+			imageToHide = ImageIO.read(hideThis);
+			placeToHide = ImageIO.read(hideIn);
+		}
+		catch(Exception e){
+			System.out.println(e);
+			return;
+		}
+		int scaleFactor = 1;
+		while(((3 * imageToHide.getWidth() * imageToHide.getHeight()) + 3 > ((scaleFactor * scaleFactor * placeToHide.getHeight() * placeToHide.getWidth())))){
+			scaleFactor += 1;
+		}
+		/* Determines the scaleFactor needed to fit all the
+	   	information from the original image into the
+	   	new image without changing its appearance.
+	   	i.e. the new image must have 3 times as many
+	   	pixels as the original + 3 after scaling to fit the image, 
+	   	dimensions, and end code.*/
+		placeToHide = scaleUp(placeToHide,scaleFactor);
+		int imageMinX = imageToHide.getMinX();
+		int imageMinY = imageToHide.getMinY();
+		int imageWidth = imageToHide.getWidth();
+		int imageHeight = imageToHide.getHeight();
+		/* Properties of the original image used to move through
+	   	pixels of the image using a loop. */
+		int[] imagePixels = new int[3 * imageWidth * imageHeight];
+		int[] currentPixelData = new int[3];
+		for (int j = 0; j < imageWidth; j+= 1){
+			/* Controls movement through the image 
+		   	horizontally. */
+			for (int i = 0; i < imageHeight; i += 1){
+				/* Controls movement through the image 
+			   	vertically. */
+				currentPixelData = getPixelData(new Color(imageToHide.getRGB(imageMinX + j, imageMinY + i)));
+				/* Gets the integers representing the pixels in the original image. */
+				imagePixels[3 * ((j * imageHeight) + i)] = currentPixelData[0];
+				imagePixels[3 * ((j * imageHeight) + i) + 1] = currentPixelData[1];
+				imagePixels[3 * ((j * imageHeight) + i) + 2] = currentPixelData[2];
+			}
+		}
+		int placeMinX = placeToHide.getMinX();
+		int placeMinY = placeToHide.getMinY();
+		int placeWidth = placeToHide.getWidth();
+		int placeHeight = placeToHide.getHeight();
+		/* Properties of the new image used to move through
+	   	pixels of the image using a loop. */
+		for(int j = 0; j < placeWidth; j += 1){
+			/* Controls movement through the image 
+		   	horizontally. */
+			for (int i = 0; i < placeHeight; i += 1){
+				/* Controls movement through the image 
+			   	vertically. */
+				if((i == 0) && (j == 0)){
+					placeToHide.setRGB(placeMinX,placeMinY,changeColor(new Color(placeToHide.getRGB(placeMinX,placeMinY)),imageWidth).getRGB());
+				}
+				else if((i == 1) && (j == 0)){
+					placeToHide.setRGB(placeMinX,placeMinY + 1,changeColor(new Color(placeToHide.getRGB(placeMinX,placeMinY + 1)),imageHeight).getRGB());
+				}
+				else if((j * placeHeight) + i == imagePixels.length + 2){
+					placeToHide.setRGB(placeMinX + j,placeMinY + i,changeColor(new Color(placeToHide.getRGB(placeMinX + j,placeMinY + i)),423).getRGB());
+					try{
+						ImageIO.write(placeToHide,"png",new File(writeTo));
+					}
+					catch(Exception e){
+						System.out.println(e);
+					}
+					return;
+				}
+				else{
+					placeToHide.setRGB(placeMinX + j, placeMinY + i,changeColor(new Color(placeToHide.getRGB(placeMinX + j,placeMinY + i)),imagePixels[(j * placeHeight) + i - 2]).getRGB());
+				}
+			}
+		}
+		return;
+		
+	}
+
+	public static int[] getPixelData(Color pixelColor){
+		
+		/*
+		 * Returns an int[] representing the given Color.
+		 */
+		
+		int[] pixelData = new int[3];
+		pixelData[0] = pixelColor.getRed();
+		pixelData[1] = pixelColor.getGreen();	
+		pixelData[2] = pixelColor.getBlue();
+		return pixelData;
+		
+	}
+	
 /*	public static int[] encryption(byte[] bytes,AES anAES){
 		/*
 		/*
@@ -163,7 +262,7 @@ public static void encodeText(File original,File writeTo,String message){
 			decodeText(encodedImage,writeTo,password);
 		}
 		else{
-			/*decodeImage(encodedImage,writeTo,password);*/
+			decodeImage(encodedImage,writeTo,password);
 		}
 		return;
 		
@@ -232,6 +331,99 @@ public static void encodeText(File original,File writeTo,String message){
 			}
 		}
 		return;
+		
+	}
+	
+	public static void decodeImage(BufferedImage encodedImage,File writeTo,String password){
+		
+		/* Recovers the image from the given image and writes it to the desired
+		   file location. */
+		
+		int encodedMinX = encodedImage.getMinX();
+		int encodedMinY = encodedImage.getMinY();
+		int encodedWidth = encodedImage.getWidth();
+		int encodedHeight = encodedImage.getHeight();
+		/* Properties of the encoded image used to move through
+		   pixels of the image using a loop. */
+		int hiddenWidth = 0;
+		int hiddenHeight = 0;
+		/* Properties of the hidden image used to move through 
+		   pixels of the image using a loop. */
+		int[] hiddenPixels = null;
+		/* Variable used to move hold the pixel data for the hidden
+		   image. */
+		int pixelInt = 0;
+		/* Holds information about number hidden in the current pixel
+		   of the encoded image. */
+		for (int j = 0; j < encodedWidth; j+= 1){
+			/* Controls movement through the image 
+			   horizontally. */
+			/* Too Long Lines ??? */
+			for (int i = 0; i < encodedHeight; 
+					i += 1){
+				/* Controls movement through the image 
+				   vertically. */
+				if ((i == 0) && (j == 0)){
+					/* Gets width of hidden image. */
+					hiddenWidth = getInt(new Color(encodedImage.getRGB(encodedMinX,encodedMinY)));
+				}
+				else if ((j == 0) && (i == 1)){
+					/* Gets height of hidden image. */
+					hiddenHeight = getInt(new Color(encodedImage.getRGB(encodedMinX,encodedMinY + 1)));
+					hiddenPixels = new int[3 * hiddenWidth * hiddenHeight];
+				}
+				else{
+					pixelInt = getInt(new Color(encodedImage.
+							getRGB((encodedMinX + j),(encodedMinY + i))));
+					if (pixelInt == 423){
+						rebuildImage(hiddenPixels,hiddenWidth,hiddenHeight,writeTo);
+						return;
+					}
+					else{
+						hiddenPixels[(j * encodedHeight) + i - 2] = pixelInt;
+					}
+				}
+			}
+		}
+		return;
+		
+	}
+	
+	public static void rebuildImage(int[] pixels,int width,int height,File writeTo){
+		
+		/*
+		 * Creates an image from data about its pixels, width, and height.
+		 */
+		
+		BufferedImage hiddenImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		for (int j = 0; j < width; j += 1){
+			/* Moves through image horizontally. */
+			for (int i = 0; i < height; i += 1){
+				/* Moves through image vertically. */
+				hiddenImage.setRGB(j,i,new Color(pixels[3 *((j * height) + i)],pixels[3 * ((j * height) + i) + 1],pixels[3 * ((j * height) + i) + 2]).getRGB());
+			}
+		}
+		try{
+			ImageIO.write(hiddenImage,"png",writeTo);
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		return;
+		
+	}
+	
+	public static int getInt(Color pixelColor){
+		
+		/*
+		 * Returns the int hidden in the Color of a pixel.
+		 */
+		
+		int[] digits = new int[3];
+		digits[0] = intToDigits(pixelColor.getRed())[2];
+		digits[1] = intToDigits(pixelColor.getGreen())[2];
+		digits[2] = intToDigits(pixelColor.getBlue())[2];
+		return digitsToInt(digits);
 		
 	}
 	
@@ -319,12 +511,15 @@ public static void encodeText(File original,File writeTo,String message){
 		   character as the last digit of the green component
 		   of the pixel. */
 		
+		if ((red[0] == 2) && (red[1] == 5) && (character[0] > 5)){
+			red[1] = 4;
+		}
+		/* Accounts for the fact that red can not exceed
+		   255. */
 		red[2] = character[0];
 		/* Places the first digit representing the input
 		   character as the last digit of the red component
-		   of the pixel. No check is needed for exceeding
-		   255 as ASCII character codes do not surpass
-		   127. */
+		   of the pixel. */
 
 		return new Color(digitsToInt(red),digitsToInt(green),
 				digitsToInt(blue));
@@ -347,19 +542,36 @@ public static void encodeText(File original,File writeTo,String message){
 		int[] number = intToDigits(inputNumber);
 		/* Breaks the input number into its digits. */
 		
+		
+		if ((blue[0] == 2) && (blue[1] == 5) && (number[2] > 5)){
+			blue[1] = 4;
+		}
+		/* Accounts for the fact that blue can not exceed
+		   255. */
 		blue[2] = number[2];
-		/* Places the third digit of the input number as the 
-		   last digit of the blue component of the pixel. */
+		/* Places the third digit representing the input
+		   number as the last digit of the blue component
+		   of the pixel. */
+		
+		if ((green[0] == 2) && (green[1] == 5) && (number[1] > 5)){
+			green[1] = 4;
+		}
+		/* Accounts for the fact that green can not exceed
+		   255. */
 		green[2] = number[1];
-		/* Places the second digit of the input number as the
-		   last digit of the green component of the pixel. */
+		/* Places the second digit representing the input
+		   number as the last digit of the green component
+		   of the pixel. */
+		
+		if ((red[0] == 2) && (red[1] == 5) && (number[0] > 5)){
+			red[1] = 4;
+		}
+		/* Accounts for the fact that red can not exceed
+		   255. */
 		red[2] = number[0];
-		/* Places the first digit of the input number as the
-		   last digit of the red component of the pixel. */
-		 
-		/* No check is needed for exceeding 255 as the codes
-		    being placed in the pixels do not contain digits
-		    larger than 5. */
+		/* Places the first digit representing the input
+		   number as the last digit of the red component
+		   of the pixel. */
 
 		return new Color(digitsToInt(red),digitsToInt(green),
 				digitsToInt(blue));
@@ -419,6 +631,21 @@ public static void encodeText(File original,File writeTo,String message){
 		   in the ones place of the final integer. */
 		return (digits[0] * 100) + (digits[1] * 10) + digits[2];
 		
+	}
+	
+	public static void main(String[] args){
+		
+		encodePicture(new File("hideImage.png"),new File("corn.png"),"encoded.png"); 
+		/*
+		BufferedImage image = null;
+		try{
+			image = ImageIO.read(new File("encoded.png"));
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		decodeImage(image,new File("decoded.png"),"");
+		*/
 	}
 	
 }
