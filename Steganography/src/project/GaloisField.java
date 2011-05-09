@@ -12,37 +12,55 @@ public class GaloisField {
 	public int mulBy2(int input){
 		if (input < 0)
 			input += 256;
-		return (int) two[input];
+		if((int) two[input] < 0)
+			return two[input] + 256;
+		else
+			return two[input];
 	}
 	
 	public int mulBy3(int input){
 		if (input < 0)
 			input += 256;
-		return (int) three[input];
+		if((int) three[input] < 0)
+			return three[input] + 256;
+		else
+			return three[input];
 	}
 	
 	public int mulBy9(int input){
 		if (input < 0)
 			input += 256;
-		return (int) nine[input];
+		if((int) nine[input] < 0)
+			return nine[input] + 256;
+		else
+			return nine[input];
 	}
 	
 	public int mulBy11(int input){
 		if (input < 0)
 			input += 256;
-		return (int) eleven[input];
+		if((int) eleven[input] < 0)
+			return eleven[input] + 256;
+		else
+			return eleven[input];
 	}
 	
 	public int mulBy13(int input){
 		if (input < 0)
 			input += 256;
-		return (int) thirteen[input];
+		if((int) thirteen[input] < 0)
+			return thirteen[input] + 256;
+		else
+			return thirteen[input];
 	}
 	
 	public int mulBy14(int input){
 		if (input < 0)
 			input += 256;
-		return (int) fourteen[input];
+		if((int) fourteen[input] < 0)
+			return fourteen[input] + 256;
+		else
+			return fourteen[input];
 	}
 	
 	
