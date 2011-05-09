@@ -22,28 +22,54 @@ public class GUI extends JPanel implements ActionListener{
 	SpringLayout layout;
 	static int textFieldHeight, textFieldWidth;
 
+	/**
+	 * Description:
+	 * This is the constructor for this class. It creates a new SpringLayout for the JFrame,
+	 * creates an information field and button, and determines how they are all laid out in the Panel.
+	 * Example:
+	 * new GUI() -> a new GUI JPanel with a button and an information field.
+	 */
+	
 	public GUI(){
 
 		layout = new SpringLayout();
 		setLayout(layout);
 		JPanel panel = new JPanel();
+		
 		JComponent infoField = createInformationField();
 		JComponent buttonField = createButton();
+		
 		panel.add(infoField);
 		panel.add(buttonField);
+		/*
+		 * Layout the Panel using SpringLayout's enumerated types.
+		 */
 		layout.putConstraint(SpringLayout.WEST, infoField, 5, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, infoField, 5, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.WEST, buttonField, 5, SpringLayout.EAST, infoField);
 		layout.putConstraint(SpringLayout.NORTH, buttonField, 30, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, buttonField);
 		layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, infoField);
+		
 		add(panel);
 		return;
 
 	}
 
+	/**
+	 * Description:
+	 * This method creates the text fields for the GUI. It assigns them labels and an action listener,
+	 * which allows them to respond to the user when they press enter.
+	 * Example:
+	 * createInformationField() -> returns a JComponent that contains four text fields with labels.
+	 * @return
+	 */
+	
 	public JComponent createInformationField(){
 
+		/*
+		 * Set up labels Strings.
+		 */
 		JPanel panel = new JPanel(new SpringLayout());
 		String[] labelStrings = {
 				"Picture location and name: ",
@@ -53,7 +79,10 @@ public class GUI extends JPanel implements ActionListener{
 		};
 		JLabel[] labels = new JLabel[labelStrings.length];
 		JTextField[] fields = new JTextField[labelStrings.length];
-
+		
+		/*
+		 * Set up each JTextField.
+		 */
 		pictureLocation = new JTextField();
 		pictureLocation.setColumns(20);
 		fields[0] = pictureLocation;
@@ -69,7 +98,10 @@ public class GUI extends JPanel implements ActionListener{
 		desiredLocation = new JTextField();
 		desiredLocation.setColumns(20);
 		fields[3] = desiredLocation;
-
+		
+		/*
+		 * Assign a JLabel to each respective JTextField and add an action listener
+		 */
 		for(int count = 0; count < labelStrings.length; count = count + 1){
 			labels[count] = new JLabel(labelStrings[count], JLabel.TRAILING);
 			labels[count].setLabelFor(fields[count]);
@@ -77,6 +109,9 @@ public class GUI extends JPanel implements ActionListener{
 			panel.add(fields[count]);
 			fields[count].addActionListener(this);
 		}
+		/*
+		 * Use the SpringUtilities class to make a compact grid.
+		 */
 		SpringUtilities.makeCompactGrid(panel, labelStrings.length, 2, 10, 10, 10, 5);
 
 		return panel;
