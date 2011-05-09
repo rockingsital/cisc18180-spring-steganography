@@ -11,7 +11,7 @@ public class AES {
 
 	public byte[][] state;
 	byte[] key;
-	byte[][] w;
+	public byte[][] w;
 	byte[][] rCon;
 	byte[][] sBox;
 	byte[][] iSBox;
@@ -129,7 +129,7 @@ public class AES {
 
 	public void encrypt(){
 		addRoundKey(0);
-		for (int round = 1; round <= (numberOfRounds - 1); ++round){
+		for (int round = 1; round < numberOfRounds; ++round){
 			subBytes(); 
 			shiftRows();  
 			mixColumns(); 
@@ -237,11 +237,15 @@ public class AES {
 	}
 
 	public void shiftRows(){
-		byte[] temp = new byte[4];
+		byte[][] temp = new byte[4][4];
+		for(int row = 0; row < 4; row++){
+			for(int col = 0; col < 4; col++){
+				temp[row][col] = state[row][col];
+			}
+		}
 		for(int row = 1; row < 4; row++){
-			temp = state[row];
 			for (int col = 0; col < 4; col++){
-				state[row][(col + 4 - row) % 4] = temp[col];
+				state[row][col] = temp[row][(col + row) % blockSize];
 			}
 		}
 	}
@@ -310,11 +314,15 @@ public class AES {
 
 	public void inverseShiftRows(){
 
-		byte[] temp = new byte[4];
+		byte[][] temp = new byte[4][4];
+		for(int row = 0; row < 4; row++){
+			for(int col = 0; col < 4; col++){
+				temp[row][col] = state[row][col];
+			}
+		}
 		for(int row = 1; row < 4; row++){
-			temp = state[row];
 			for (int col = 0; col < 4; col++){
-				state[row][(col + 4 + row) % 4] = temp[col];
+				state[row][col] = temp[row][((col + 4) - row) % blockSize];
 			}
 		}
 	}

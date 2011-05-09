@@ -64,4 +64,32 @@ public class AesTest {
 		assertTrue("Inv Mix Col", testAES.state[2][2] == 1);
 		assertTrue("Inv Mix Col", testAES.state[3][3] == -58);
 	}
+	
+	@Test
+	public void testAddRoundKey(){
+		byte[] byteArray = new byte[16];
+		for (int count = 0; count < 16; count++)
+			byteArray[count] = (byte)(count);
+		AES testAES = new AES(byteArray);
+		testAES.addRoundKey(0);
+		assertTrue("Add Round Key", testAES.state[0][0] == 110);
+		assertTrue("Add Round Key", testAES.state[0][1] == 7);
+		assertTrue("Add Round Key", testAES.state[0][2] == 69);
+		assertTrue("Add Round Key", testAES.state[0][3] == 24);
+		assertTrue("Add Round Key", testAES.state[1][0] == -92);
+		assertTrue("Add Round Key", testAES.state[1][1] == 90);
+		assertTrue("Add Round Key", testAES.state[1][2] == -60);
+		assertTrue("Add Round Key", testAES.state[1][3] == -36);
+	}
+	
+	@Test
+	public void testShiftRows(){
+		byte[] byteArray = new byte[16];
+		for (int count = 0; count < 16; count++)
+			byteArray[count] = (byte)(count);
+		AES testAES = new AES(byteArray);
+		TwoDimensionalArray.print(testAES.state);
+		testAES.shiftRows();
+		TwoDimensionalArray.print(testAES.state);
+	}
 }
