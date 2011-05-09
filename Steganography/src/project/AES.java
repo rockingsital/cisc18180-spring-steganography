@@ -62,7 +62,6 @@ public class AES {
 	}
 
 	public byte[] generateKey(){
-		/**
 		KeyGenerator kgen = null;
 		try {
 			//Use AES encryption
@@ -77,12 +76,13 @@ public class AES {
 		//Put that key in a byte[]
 		byte [] encoded = aeskey.getEncoded();
 		return encoded;
-		 **/
+		/**
 		String key = "6ea013aa065fd44347c2b9371bdb2df31c66770409c7ac40";
 		byte[] output = new byte[24];
 		for (int i = 0; i < 48; i = i + 2)
 			output[i/2] = (byte) ((Character.digit(key.charAt(i), 16) << 4) + Character.digit(key.charAt(i+1), 16));
 		return output;
+		**/
 	}
 
 	public static String arrayToString(byte[] input){
