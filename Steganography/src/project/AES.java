@@ -40,10 +40,11 @@ public class AES {
 			testText[i] = (byte) ((i+3) * 5);
 		long startTime = System.currentTimeMillis();
 		AES test = new AES(testText);
-		System.out.println(System.currentTimeMillis() - startTime);
-		System.out.println("192 bit Key Example: " + arrayToString(test.key));
+		System.out.println("Time to make instance of AES: " + (System.currentTimeMillis() - startTime) + "ms");
+		System.out.println("192 bit Key: " + arrayToString(test.key));
 		//TwoDimensionalArray.print(test.state);
-		System.out.println("Input State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		System.out.println("Input State:     " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
+		startTime = System.currentTimeMillis();
 		test.encrypt();
 		/**
 		System.out.println("rCon");
@@ -54,11 +55,11 @@ public class AES {
 		TwoDimensionalArray.print(test.iSBox);
 		System.out.println("Key Expansion");
 		TwoDimensionalArray.print(test.w);
-		System.out.println("Encrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 		**/
+		System.out.println("Encrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
 		test.decrypt();
 		System.out.println("Decrypted State: " + arrayToString(TwoDimensionalArray.toSingleArray(test.state)));
-		System.out.println(System.currentTimeMillis() - startTime);
+		System.out.println("Time to Encrypt and then Decrypt: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 
 	public byte[] generateKey(){
