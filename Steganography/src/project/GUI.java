@@ -105,11 +105,11 @@ public class GUI extends JPanel implements ActionListener{
 		}
 		else{
 			if (!pass.contentEquals("") && !secretInfo.contentEquals("")){
-				System.out.println("You can't enter either ");
+				System.out.println("You can't enter both a password and secret information.");
 			}
 			else if (pass.contentEquals("")){
 				if (isPicture(secretInfo)){
-					//EncodeAndDecode.encodePicture(fromFile, toFile, secretInfo);
+					EncodeAndDecode.encodePicture(fromFile, toFile, secretInfo);
 				}
 				else{
 					EncodeAndDecode.encodeText(fromFile, toFile, secretInfo);
