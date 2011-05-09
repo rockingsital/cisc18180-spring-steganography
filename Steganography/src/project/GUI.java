@@ -16,12 +16,12 @@ import java.io.File;
 
 @SuppressWarnings("serial")
 public class GUI extends JPanel implements ActionListener{
-	
+
 	JTextField pictureLocation, password, secret,desiredLocation;
 	static JFrame frame;
 	SpringLayout layout;
 	static int textFieldHeight, textFieldWidth;
-	
+
 	public GUI(){
 
 		layout = new SpringLayout();
@@ -39,11 +39,11 @@ public class GUI extends JPanel implements ActionListener{
 		layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, infoField);
 		add(panel);
 		return;
-		
+
 	}
-	
+
 	public JComponent createInformationField(){
-		
+
 		JPanel panel = new JPanel(new SpringLayout());
 		String[] labelStrings = {
 				"Picture location and name: ",
@@ -53,23 +53,23 @@ public class GUI extends JPanel implements ActionListener{
 		};
 		JLabel[] labels = new JLabel[labelStrings.length];
 		JTextField[] fields = new JTextField[labelStrings.length];
-		
+
 		pictureLocation = new JTextField();
 		pictureLocation.setColumns(20);
 		fields[0] = pictureLocation;
-		
+
 		password = new JTextField();
 		password.setColumns(20);
 		fields[1] = password;
-		
+
 		secret = new JTextField();
 		secret.setColumns(20);
 		fields[2] = secret;
-		
+
 		desiredLocation = new JTextField();
 		desiredLocation.setColumns(20);
 		fields[3] = desiredLocation;
-		
+
 		for(int count = 0; count < labelStrings.length; count = count + 1){
 			labels[count] = new JLabel(labelStrings[count], JLabel.TRAILING);
 			labels[count].setLabelFor(fields[count]);
@@ -78,23 +78,23 @@ public class GUI extends JPanel implements ActionListener{
 			fields[count].addActionListener(this);
 		}
 		SpringUtilities.makeCompactGrid(panel, labelStrings.length, 2, 10, 10, 10, 5);
-		
+
 		return panel;
 	}
-	
+
 	public JComponent createButton(){
-		
+
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-		
+
 		JButton button = new JButton("Encode/Decode!");
 		button.addActionListener(this);
 		panel.add(button);
-		
+
 		return panel;
 	}
-	
+
 	public void actionPerformed(ActionEvent action){
-		
+
 		File fromFile = new File(pictureLocation.getText());
 		String pass = password.getText();
 		String secretInfo = secret.getText();
@@ -109,7 +109,10 @@ public class GUI extends JPanel implements ActionListener{
 			}
 			else if (pass.contentEquals("")){
 				if (isPicture(secretInfo)){
-					EncodeAndDecode.encodePicture(fromFile, toFile, secretInfo);
+					String writeTo = desiredLocation.getText();
+					File hideThis = new File(secretInfo);
+					File hideIn = fromFile;
+					EncodeAndDecode.encodePicture(hideThis, hideIn, writeTo);
 				}
 				else{
 					EncodeAndDecode.encodeText(fromFile, toFile, secretInfo);
@@ -127,13 +130,16 @@ public class GUI extends JPanel implements ActionListener{
 		}
 		return;
 	}
-	
+
 	public boolean isPicture(String secretInfo){
-		
-		return (secretInfo.charAt(0) == 'C' && secretInfo.charAt(1) == ':' && secretInfo.charAt(2) == '\\') ||
-		(secretInfo.charAt(0) == '\\');
+		if(secretInfo.length() > 0){
+			return (secretInfo.charAt(0) == 'C' && secretInfo.charAt(1) == ':' && secretInfo.charAt(2) == '\\') ||
+			(secretInfo.charAt(0) == '/');
+		}
+		else
+			return false;
 	}
-	
+
 	public void resize(ImagePanel imgPanel){
 
 		layout.putConstraint(SpringLayout.NORTH, imgPanel, textFieldHeight, SpringLayout.NORTH, this);
@@ -151,19 +157,19 @@ public class GUI extends JPanel implements ActionListener{
 		this.updateUI();
 		return;
 	}
-	
+
 	public static void createAndShowGUI(){
-		
+
 		frame = new JFrame("Steganography");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(new GUI());
-        frame.pack();
-        frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().add(new GUI());
+		frame.pack();
+		frame.setVisible(true);
 		textFieldWidth = frame.getWidth();
 		textFieldHeight = frame.getHeight();
 		return;
 	}
-	
+
 	/**
 	 * @param args
 	 */
