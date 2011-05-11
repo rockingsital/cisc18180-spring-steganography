@@ -1,6 +1,6 @@
 package com.example.Steganography;
 
-import com.example.HelloAndroid.R;
+import com.example.Steganography.R;
 
 import android.app.Activity;
 import android.content.Intent;
