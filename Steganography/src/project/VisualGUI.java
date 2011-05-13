@@ -56,6 +56,10 @@ public class VisualGUI extends JFrame {
 	private JButton decodeButton = null;
 	private JScrollPane decodeStartingPicturePane = null;
 	private JLabel decodeOriginalPictureLabel = null;
+	private JTextField encodeOutputName = null;
+	private JLabel encodeOutputNameLabel = null;
+	private JTextField decodeOutputName = null;
+	private JLabel decodeOutputNameLabel = null;
 	/**
 	 * This method initializes tabs	
 	 * 	
@@ -93,22 +97,25 @@ public class VisualGUI extends JFrame {
 	 */
 	private JPanel getLeftSideEncode() {
 		if (leftSideEncode == null) {
+			encodeOutputNameLabel = new JLabel();
+			encodeOutputNameLabel.setBounds(new Rectangle(9, 242, 95, 26));
+			encodeOutputNameLabel.setText("Output Name");
 			encodeSecretPicturelabel = new JLabel();
-			encodeSecretPicturelabel.setBounds(new Rectangle(137, 236, 79, 17));
+			encodeSecretPicturelabel.setBounds(new Rectangle(134, 285, 107, 17));
 			encodeSecretPicturelabel.setText("Secret Image");
 			encodeOutputLabel = new JLabel();
-			encodeOutputLabel.setBounds(new Rectangle(8, 195, 93, 27));
+			encodeOutputLabel.setBounds(new Rectangle(2, 195, 106, 27));
 			encodeOutputLabel.setText("Output Location");
 			encodeSecretPictureLabel = new JLabel();
-			encodeSecretPictureLabel.setBounds(new Rectangle(14, 152, 85, 24));
+			encodeSecretPictureLabel.setBounds(new Rectangle(3, 152, 98, 24));
 			encodeSecretPictureLabel.setText("Secret Picture");
 			encodeSecretPictureLabel.setVisible(false);
 			encodeSecretTextLabel = new JLabel();
-			encodeSecretTextLabel.setBounds(new Rectangle(9, 105, 95, 29));
+			encodeSecretTextLabel.setBounds(new Rectangle(2, 105, 108, 29));
 			encodeSecretTextLabel.setText("Secret Message");
 			encodeSecretTextLabel.setVisible(false);
 			encodeStartingPictureLabel = new JLabel();
-			encodeStartingPictureLabel.setBounds(new Rectangle(8, 57, 93, 27));
+			encodeStartingPictureLabel.setBounds(new Rectangle(1, 57, 108, 27));
 			encodeStartingPictureLabel.setText("Starting Picture");
 			leftSideEncode = new JPanel();
 			leftSideEncode.setLayout(null);
@@ -128,6 +135,8 @@ public class VisualGUI extends JFrame {
 			leftSideEncode.add(getEncodeButton(), null);
 			leftSideEncode.add(getEncodeSecretPicturePane(), null);
 			leftSideEncode.add(encodeSecretPicturelabel, null);
+			leftSideEncode.add(getEncodeOutputName(), null);
+			leftSideEncode.add(encodeOutputNameLabel, null);
 		}
 		return leftSideEncode;
 	}
@@ -140,7 +149,7 @@ public class VisualGUI extends JFrame {
 	private JPanel getRightSideEncode() {
 		if (rightSideEncode == null) {
 			encodeOriginalImageLabel = new JLabel();
-			encodeOriginalImageLabel.setBounds(new Rectangle(204, 4, 90, 21));
+			encodeOriginalImageLabel.setBounds(new Rectangle(191, 4, 120, 21));
 			encodeOriginalImageLabel.setText("Starting Image");
 			rightSideEncode = new JPanel();
 			rightSideEncode.setLayout(null);
@@ -182,7 +191,7 @@ public class VisualGUI extends JFrame {
 	private JRadioButton getEncodePictureRadio() {
 		if (encodePictureRadio == null) {
 			encodePictureRadio = new JRadioButton();
-			encodePictureRadio.setBounds(new Rectangle(114, 16, 70, 34));
+			encodePictureRadio.setBounds(new Rectangle(98, 16, 88, 34));
 			encodePictureRadio.setText("Picture");
 			encodePictureRadio.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -349,14 +358,15 @@ public class VisualGUI extends JFrame {
 			encodeButton.setText("Encode!");
 			encodeButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					File newFileName = new File(encodeArguments[1], encodeOutputName.getText());
 					if (encodeTextRadio.isSelected()){
 						EncodeAndDecode.encodeText(encodeArguments[0], 
-								encodeArguments[1], 
+								newFileName, 
 								encodeSecretText.getText());
 					}
 					else if (encodePictureRadio.isSelected()){
 						EncodeAndDecode.encodePicture(encodeArguments[2], 
-								encodeArguments[0], encodeArguments[1].getAbsolutePath());
+								encodeArguments[0], newFileName.getAbsolutePath());
 					}
 					else{
 						System.out.println("Please select to encode with either a picture or with text.");
@@ -375,7 +385,7 @@ public class VisualGUI extends JFrame {
 	private JScrollPane getEncodeSecretPicturePane() {
 		if (encodeSecretPicturePane == null) {
 			encodeSecretPicturePane = new JScrollPane();
-			encodeSecretPicturePane.setBounds(new Rectangle(1, 257, 346, 298));
+			encodeSecretPicturePane.setBounds(new Rectangle(1, 307, 346, 248));
 		}
 		return encodeSecretPicturePane;
 	}
@@ -400,17 +410,20 @@ public class VisualGUI extends JFrame {
 	 */
 	private JPanel getDecode() {
 		if (decode == null) {
+			decodeOutputNameLabel = new JLabel();
+			decodeOutputNameLabel.setBounds(new Rectangle(405, 75, 97, 24));
+			decodeOutputNameLabel.setText("Output Name");
 			decodeOriginalPictureLabel = new JLabel();
-			decodeOriginalPictureLabel.setBounds(new Rectangle(376, 127, 95, 20));
+			decodeOriginalPictureLabel.setBounds(new Rectangle(376, 127, 108, 20));
 			decodeOriginalPictureLabel.setText("Original Picture");
 			decodePasswordLabel = new JLabel();
-			decodePasswordLabel.setBounds(new Rectangle(416, 60, 80, 22));
+			decodePasswordLabel.setBounds(new Rectangle(414, 33, 80, 22));
 			decodePasswordLabel.setText("Password");
 			decodeOutputLocationLabel = new JLabel();
-			decodeOutputLocationLabel.setBounds(new Rectangle(12, 79, 99, 25));
+			decodeOutputLocationLabel.setBounds(new Rectangle(3, 79, 111, 25));
 			decodeOutputLocationLabel.setText("Output Location");
 			decodeStartingPictureLabel = new JLabel();
-			decodeStartingPictureLabel.setBounds(new Rectangle(12, 33, 100, 26));
+			decodeStartingPictureLabel.setBounds(new Rectangle(2, 33, 108, 26));
 			decodeStartingPictureLabel.setText("Starting Picture");
 			decode = new JPanel();
 			decode.setLayout(null);
@@ -425,6 +438,8 @@ public class VisualGUI extends JFrame {
 			decode.add(getDecodeButton(), null);
 			decode.add(getDecodeStartingPicturePane(), null);
 			decode.add(decodeOriginalPictureLabel, null);
+			decode.add(getDecodeOutputName(), null);
+			decode.add(decodeOutputNameLabel, null);
 		}
 		return decode;
 	}
@@ -519,7 +534,7 @@ public class VisualGUI extends JFrame {
 	private JTextField getDecodePassword() {
 		if (decodePassword == null) {
 			decodePassword = new JTextField();
-			decodePassword.setBounds(new Rectangle(506, 57, 173, 29));
+			decodePassword.setBounds(new Rectangle(506, 27, 173, 29));
 		}
 		return decodePassword;
 	}
@@ -536,7 +551,8 @@ public class VisualGUI extends JFrame {
 			decodeButton.setText("Decode!");
 			decodeButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					EncodeAndDecode.decode(decodeArguments[0], decodeArguments[1], decodePassword.getText());
+					File newFileName = new File(decodeArguments[1], decodeOutputName.getText());
+					EncodeAndDecode.decode(decodeArguments[0], newFileName, decodePassword.getText());
 				}
 			});
 		}
@@ -554,6 +570,34 @@ public class VisualGUI extends JFrame {
 			decodeStartingPicturePane.setBounds(new Rectangle(0, 150, 847, 407));
 		}
 		return decodeStartingPicturePane;
+	}
+
+	/**
+	 * This method initializes encodeOutputName	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getEncodeOutputName() {
+		if (encodeOutputName == null) {
+			encodeOutputName = new JTextField();
+			encodeOutputName.setBounds(new Rectangle(108, 241, 124, 28));
+			encodeOutputName.setText("newImage.png");
+		}
+		return encodeOutputName;
+	}
+
+	/**
+	 * This method initializes decodeOutputName	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getDecodeOutputName() {
+		if (decodeOutputName == null) {
+			decodeOutputName = new JTextField();
+			decodeOutputName.setBounds(new Rectangle(505, 74, 172, 28));
+			decodeOutputName.setText("textOrPic.txt/png");
+		}
+		return decodeOutputName;
 	}
 
 	/**
