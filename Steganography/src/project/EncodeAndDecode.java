@@ -427,15 +427,15 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 				   vertically. */
 				if ((i == 0) && (j == 0)){
 					/* Gets width of hidden image. */
-					hiddenWidth = getInt(new Color(encodedImage.getRGB(encodedMinX,encodedMinY)));
+					hiddenWidth = getHiddenInt(new Color(encodedImage.getRGB(encodedMinX,encodedMinY)));
 				}
 				else if ((j == 0) && (i == 1)){
 					/* Gets height of hidden image. */
-					hiddenHeight = getInt(new Color(encodedImage.getRGB(encodedMinX,encodedMinY + 1)));
+					hiddenHeight = getHiddenInt(new Color(encodedImage.getRGB(encodedMinX,encodedMinY + 1)));
 					hiddenPixels = new int[3 * hiddenWidth * hiddenHeight];
 				}
 				else{
-					pixelInt = getInt(new Color(encodedImage.
+					pixelInt = getHiddenInt(new Color(encodedImage.
 							getRGB((encodedMinX + j),(encodedMinY + i))));
 					if (pixelInt == 423){
 						hiddenPixels = decryption(hiddenPixels,anAES);
@@ -511,7 +511,7 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
-	public static int getInt(Color pixelColor){
+	public static int getHiddenInt(Color pixelColor){
 		
 		/*
 		 * Returns the int hidden in the Color of a pixel.
