@@ -54,7 +54,12 @@ public class AES {
 		System.out.println("192 bit Key: " + arrayToString(test.key));
 		startTime = System.currentTimeMillis();
 		System.out.println("Input State:     " + arrayToString(testText));
-		byte[] cipherText = test.encrypt(testText);
+		byte[] cipherText = null;
+		try {
+			cipherText = test.encrypt(testText);
+		} catch (WrongSizeArrayException e) {
+			e.printStackTrace();
+		}
 		/**
 		System.out.println("rCon");
 		TwoDimensionalArray.print(test.rCon);
