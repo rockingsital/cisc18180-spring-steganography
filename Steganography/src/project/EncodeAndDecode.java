@@ -2,14 +2,20 @@ package project;
 
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
 import java.io.File;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.TextArea;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 
 public class EncodeAndDecode{
 
-public static void encodeText(File original,File writeTo,String message){
+public static void encodeText(File original,File writeTo,String message,AES anAES){
 		
 		/*
 		 * Hides a text message in an image.
@@ -37,6 +43,11 @@ public static void encodeText(File original,File writeTo,String message){
 		int minY = encodedImage.getMinY();
 		int width = encodedImage.getWidth();
 		int height = encodedImage.getHeight();
+		int[] messageData = new int[message.length()];
+		for (int i = 0; i < messageData.length; i += 1){
+			messageData[i] = (int) message.charAt(i);
+		}
+		messageData = encryption(messageData,anAES);
 		for (int j = 0; j < width; j+= 1){
 			/* Controls movement through the image 
 			   horizontally. */
@@ -69,6 +80,7 @@ public static void encodeText(File original,File writeTo,String message){
 					/* End Code??? */
 					try{
 						ImageIO.write(encodedImage,"png",writeTo);
+						showImage(encodedImage);
 					}
 					catch (Exception e){
 						System.out.println(e);
@@ -79,7 +91,7 @@ public static void encodeText(File original,File writeTo,String message){
 					encodedImage.setRGB(minX + j,minY + i,
 							changeColor(new Color(encodedImage.
 							getRGB((minX + j),(minY + i))
-							),message.charAt((j * height) + i - 1))
+							),messageData[(j * height) + i - 1])
 							.getRGB());
 					/* Changes the Color of the current pixel
 				   	so that a character of the message is
@@ -91,7 +103,7 @@ public static void encodeText(File original,File writeTo,String message){
 		
 	}
 
-	public static void encodePicture(File hideThis,File hideIn,String writeTo){
+	public static void encodePicture(File hideThis,File hideIn,String writeTo,AES anAES){
 	
 		/*
 		 * Hides an image in another image.
@@ -139,6 +151,7 @@ public static void encodeText(File original,File writeTo,String message){
 				imagePixels[3 * ((j * imageHeight) + i) + 2] = currentPixelData[2];
 			}
 		}
+		imagePixels = encryption(imagePixels,anAES);
 		int placeMinX = placeToHide.getMinX();
 		int placeMinY = placeToHide.getMinY();
 		int placeWidth = placeToHide.getWidth();
@@ -161,6 +174,7 @@ public static void encodeText(File original,File writeTo,String message){
 					placeToHide.setRGB(placeMinX + j,placeMinY + i,changeColor(new Color(placeToHide.getRGB(placeMinX + j,placeMinY + i)),423).getRGB());
 					try{
 						ImageIO.write(placeToHide,"png",new File(writeTo));
+						showImage(placeToHide);
 					}
 					catch(Exception e){
 						System.out.println(e);
@@ -190,34 +204,65 @@ public static void encodeText(File original,File writeTo,String message){
 		
 	}
 	
-/*	public static int[] encryption(byte[] bytes,AES anAES){
+	public static int[] encryption(int[] pixels,AES anAES){
+		
 		/*
-		/*
-		 * Prepares information to be encoded for encryption.
+		 * Encrypts the information representing the secret message or image.
 		 */
-		/*
-		int[] encrypted = new int[bytes.length];
+		
+		int[] encrypted = new int[pixels.length];
 		byte[] encryptedBytes = new byte[16];
-		for (int i = 0; i <= (bytes.length/16); i += 1){
-			if(i == (bytes.length/16)){
-				encryptedBytes = getPortion(bytes,(16 * i),(bytes.length % 16));
-				for (int j = (bytes.length % 16); j < (16 * (i+1)); j += 1){
+		for (int i = 0; i <= (pixels.length/16); i += 1){
+			if(i == (pixels.length/16)){
+				encryptedBytes = convertToBytes(getPortion(pixels,(16 * i),(pixels.length % 16)));
+				for (int j = (pixels.length % 16); j < (16 * (i+1)); j += 1){
 					encryptedBytes[j] = (char) ' ';
 				}
 				encryptedBytes = anAES.encrypt(encryptedBytes);
 			}
 			else{
-				encryptedBytes = anAES.encrypt(getPortion(bytes,(16 * i),(16 * (i + 1))));
+				encryptedBytes = anAES.encrypt(convertToBytes(getPortion(pixels,(16 * i),(16 * (i + 1)))));
 			}
-			for(int j = 0; j < 16; j += 1){
+			for(int j = 0; j < encrypted.length; j += 1){
 				encrypted[(i * 16) + j] = (int) encryptedBytes[j];
 			}
 		}
 		return encrypted;
 		
-		
-	}*/
+	}
 
+	public static int[] decryption(int[] encrypted,AES anAES){
+		
+		/*
+		 * Decrypts the information representing the secret message or image.
+		 */
+		
+		int[] decrypted = new int[encrypted.length];
+		byte[] decryptedBytes = new byte[16];
+		for (int i = 0; i < (decrypted.length/16); i += 1){
+			decryptedBytes = anAES.decrypt(convertToBytes(getPortion(encrypted,(16*i),(16*(i+1)))));
+			for (int j = 0; j < 16; j += 1){
+				decrypted[(16 * i) + j] = (int) decryptedBytes[j];
+			}
+		}
+		return decrypted;
+		
+	}
+	
+	public static byte[] convertToBytes(int[] ints){
+		
+		/*
+		 * Converts an int array to a byte array.
+		 */
+
+		byte[] bytes = new byte[ints.length];
+		for (int i = 0; i < ints.length; i += 1){
+			bytes[i] = (byte) ints[i];
+		}
+		return bytes;
+		
+	}
+	
 	public static int[] getPortion(int[] original,int startIndex, int endIndex){
 		
 		/*
@@ -258,11 +303,16 @@ public static void encodeText(File original,File writeTo,String message){
 			System.out.println(e);
 			return;
 		}
+		byte[] key = new byte[password.length()];
+		for(int i = 0; i < key.length; i += 1){
+			key[i] = (byte) password.charAt(i);
+		}
+		AES anAES = new AES(key);
 		if (checkText(encodedImage)){
-			decodeText(encodedImage,writeTo,password);
+			decodeText(encodedImage,writeTo,anAES);
 		}
 		else{
-			decodeImage(encodedImage,writeTo,password);
+			decodeImage(encodedImage,writeTo,anAES);
 		}
 		return;
 		
@@ -284,7 +334,7 @@ public static void encodeText(File original,File writeTo,String message){
 		
 	}
 
-	public static void decodeText(BufferedImage encodedImage,File writeTo,String password){
+	public static void decodeText(BufferedImage encodedImage,File writeTo,AES anAES){
 		
 		/* Recovers the message from the given image and writes it to the desired
 		   file location. */
@@ -296,6 +346,9 @@ public static void encodeText(File original,File writeTo,String message){
 		int height = encodedImage.getHeight();
 		/* Properties of the image used to move through
 		   pixels of the image using a loop. */
+		int[] messageNumbers = new int[width*height];
+		/* Holds the numbers representing the hidden message within the picture. */
+		int[] currentPixel = new int[3];
 		for (int j = 0; j < width; j+= 1){
 			/* Controls movement through the image 
 			   horizontally. */
@@ -311,13 +364,20 @@ public static void encodeText(File original,File writeTo,String message){
 				}
 				else{
 					/* Change ??? */
-					String nextCharacter = getText(new Color(encodedImage.
+					currentPixel = getPixelDigits(new Color(encodedImage.
 							getRGB((minX + j),(minY + i))));
-					if (nextCharacter.equals("done")){
+					if((currentPixel[0] == 4) && (currentPixel[1] == 2) && (currentPixel[2] == 3)){
+						messageNumbers = decryption(messageNumbers,anAES);
+						message = convertToText(messageNumbers);
 						try{
 							BufferedWriter output = new BufferedWriter(new FileWriter(writeTo));
 							output.write(message);
 							output.close();
+							JFrame frame = new JFrame("Drawing Frame");
+						    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+						    frame.getContentPane().add(new TextArea(message));
+						    frame.setSize(400,400);
+						    frame.setVisible(true);
 						}
 						catch (Exception e){
 							System.out.println(e);
@@ -325,7 +385,9 @@ public static void encodeText(File original,File writeTo,String message){
 						return;
 					}
 					else{
-						message = message.concat(nextCharacter);
+						messageNumbers[(3*((j*width)+i-1))] = currentPixel[0];
+						messageNumbers[(3*((j*width)+i-1))+1] = currentPixel[1];
+						messageNumbers[(3*((j*width)+i-1))+2] = currentPixel[2];
 					}
 				}
 			}
@@ -334,7 +396,7 @@ public static void encodeText(File original,File writeTo,String message){
 		
 	}
 	
-	public static void decodeImage(BufferedImage encodedImage,File writeTo,String password){
+	public static void decodeImage(BufferedImage encodedImage,File writeTo,AES anAES){
 		
 		/* Recovers the image from the given image and writes it to the desired
 		   file location. */
@@ -376,6 +438,7 @@ public static void encodeText(File original,File writeTo,String message){
 					pixelInt = getInt(new Color(encodedImage.
 							getRGB((encodedMinX + j),(encodedMinY + i))));
 					if (pixelInt == 423){
+						hiddenPixels = decryption(hiddenPixels,anAES);
 						rebuildImage(hiddenPixels,hiddenWidth,hiddenHeight,writeTo);
 						return;
 					}
@@ -386,6 +449,40 @@ public static void encodeText(File original,File writeTo,String message){
 			}
 		}
 		return;
+		
+	}
+	
+	public static int[] getPixelDigits(Color pixelColor){
+		
+		/*
+		 * Returns the last digits of the Red, Green, and Blue components of the 
+		 * given Color.
+		 */
+		
+		int[] pixelDigits = new int[3];
+		pixelDigits[0] = intToDigits(pixelColor.getRed())[2];
+		pixelDigits[1] = intToDigits(pixelColor.getGreen())[2];
+		pixelDigits[2] = intToDigits(pixelColor.getBlue())[2];
+		return pixelDigits;
+		
+	}
+	
+	public static String convertToText(int[] messageNumbers){
+		
+		/*
+		 * Given an array of integers, returns the message represented by the 
+		 * numbers.
+		 */
+		
+		String message = "";
+		int[] characterNumbers = new int[3];
+		for(int i = 0; i < messageNumbers.length/3; i += 1){
+			characterNumbers[0] = messageNumbers[(3*i)];
+			characterNumbers[1] = messageNumbers[(3*i)+1];
+			characterNumbers[2] = messageNumbers[(3*i)+2];
+			message.concat(Character.toString((char) digitsToInt(characterNumbers)));
+		}
+		return message;
 		
 	}
 	
@@ -405,6 +502,7 @@ public static void encodeText(File original,File writeTo,String message){
 		}
 		try{
 			ImageIO.write(hiddenImage,"png",writeTo);
+			showImage(hiddenImage);
 		}
 		catch(Exception e){
 			System.out.println(e);
@@ -452,80 +550,6 @@ public static void encodeText(File original,File writeTo,String message){
 		
 	}
 	
-	public static String getText(Color pixelColor){
-		
-		/*
-		 * Gets the text hidden in the given Color.
-		 */
-		
-		/* Exception if not ASCII??? */
-		
-		int[] characterNumbers = {(pixelColor.getRed() % 
-				10),(pixelColor.getGreen() % 
-						10),(pixelColor.getBlue() % 
-								10)};
-		/* Change ??? */
-		if ((characterNumbers[0] == 4) && (characterNumbers[1] == 2) && (characterNumbers[2] == 3)){
-			return "done";
-		}
-		char[] character = {(char) digitsToInt(characterNumbers)};
-		return new String(character);
-		
-	}
-	
-	public static Color changeColor(Color currentColor,char inputCharacter){
-		
-		/*
-		 * Returns a Color representing the given character
-		 * being placed in the given Color.
-		 */
-		
-		int[] red = intToDigits(currentColor.getRed());
-		int[] green = intToDigits(currentColor.getGreen());
-		int[] blue = intToDigits(currentColor.getBlue());
-		/* Breaks the integers representing the red, green, 
-		   and blue components of the pixel color into its
-		   digits. */
-		int[] character = intToDigits((int) inputCharacter);
-		/* Breaks the integer representing the input 
-		   character under the ASCII system into its 
-		   digits. */
-		
-		if ((blue[0] == 2) && (blue[1] == 5) && (character[2] > 5)){
-			blue[1] = 4;
-		}
-		/* Accounts for the fact that blue can not exceed
-		   255. */
-		blue[2] = character[2];
-		/* Places the third digit representing the input
-		   character as the last digit of the blue component
-		   of the pixel. */
-		
-		if ((green[0] == 2) && (green[1] == 5) && (character[1] > 5)){
-			green[1] = 4;
-		}
-		/* Accounts for the fact that green can not exceed
-		   255. */
-		green[2] = character[1];
-		/* Places the second digit representing the input
-		   character as the last digit of the green component
-		   of the pixel. */
-		
-		if ((red[0] == 2) && (red[1] == 5) && (character[0] > 5)){
-			red[1] = 4;
-		}
-		/* Accounts for the fact that red can not exceed
-		   255. */
-		red[2] = character[0];
-		/* Places the first digit representing the input
-		   character as the last digit of the red component
-		   of the pixel. */
-
-		return new Color(digitsToInt(red),digitsToInt(green),
-				digitsToInt(blue));
-		
-	}
-	
 	public static Color changeColor(Color currentColor,int inputNumber){
 		
 		/*
@@ -548,6 +572,16 @@ public static void encodeText(File original,File writeTo,String message){
 		}
 		/* Accounts for the fact that blue can not exceed
 		   255. */
+		else if((number[2] - blue[2]) > 5){
+			blue[1] -= 1;
+		}
+		/* If the number to put in is 5 greater than the current last digit,
+		   reduce the second digit by 1. */
+		else if(blue[2] - number[2] > 5){
+			blue[1] += 1;
+		}
+		/* If the current last digit is 5 greater than the digit to be put in,
+		   increase the second digit by 1. */
 		blue[2] = number[2];
 		/* Places the third digit representing the input
 		   number as the last digit of the blue component
@@ -558,6 +592,16 @@ public static void encodeText(File original,File writeTo,String message){
 		}
 		/* Accounts for the fact that green can not exceed
 		   255. */
+		else if((number[1] - green[2]) > 5){
+			green[1] -= 1;
+		}
+		/* If the number to put in is 5 greater than the current last digit,
+		   reduce the second digit by 1. */
+		else if(green[2] - number[1] > 5){
+			green[1] += 1;
+		}
+		/* If the current last digit is 5 greater than the digit to be put in,
+		   increase the second digit by 1. */
 		green[2] = number[1];
 		/* Places the second digit representing the input
 		   number as the last digit of the green component
@@ -568,6 +612,16 @@ public static void encodeText(File original,File writeTo,String message){
 		}
 		/* Accounts for the fact that red can not exceed
 		   255. */
+		else if((number[0] - red[2]) > 5){
+			red[1] -= 1;
+		}
+		/* If the number to put in is 5 greater than the current last digit,
+		   reduce the second digit by 1. */
+		else if(red[2] - number[0] > 5){
+			red[1] += 1;
+		}
+		/* If the current last digit is 5 greater than the digit to be put in,
+		   increase the second digit by 1. */
 		red[2] = number[0];
 		/* Places the first digit representing the input
 		   number as the last digit of the red component
@@ -633,19 +687,48 @@ public static void encodeText(File original,File writeTo,String message){
 		
 	}
 	
-	public static void main(String[] args){
+	public static void showImage(BufferedImage anImage){
 		
-		encodePicture(new File("hideImage.png"),new File("scoobyDoo.png"),"encoded.png"); 
 		/*
-		BufferedImage image = null;
+		 * Displays the given image.
+		 */
+		
+		JFrame frame = new JFrame("Drawing Frame");
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    MyCanvas canvas = new MyCanvas(anImage);
+	    frame.getContentPane().add(canvas);
+	    frame.setSize(1000,1000);
+	    frame.setVisible(true);
+	    return;
+		
+	}
+	
+}
+
+class MyCanvas extends JComponent{
+	
+	BufferedImage image;
+	
+	public MyCanvas(BufferedImage anImage){
+		
+		/*
+		 * Constructor for the MyCanvas class. 
+		 */
+		
+		image = anImage;
+		
+	}
+	
+	public void paint(Graphics g){
+	
+		Graphics2D g2d = (Graphics2D) g;
 		try{
-			image = ImageIO.read(new File("encoded.png"));
+			g2d.drawImage(image,null,1,1);
 		}
 		catch(Exception e){
 			System.out.println(e);
 		}
-		decodeImage(image,new File("decoded.png"),"");
-		*/
+		
 	}
 	
 }
