@@ -218,10 +218,20 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 				for (int j = (pixels.length % 16); j < (16 * (i+1)); j += 1){
 					encryptedBytes[j] = (char) ' ';
 				}
-				encryptedBytes = anAES.encrypt(encryptedBytes);
+				try{
+					encryptedBytes = anAES.encrypt(encryptedBytes);
+				}
+				catch(Exception e){
+					System.out.println(e);
+				}
 			}
 			else{
-				encryptedBytes = anAES.encrypt(convertToBytes(getPortion(pixels,(16 * i),(16 * (i + 1)))));
+				try{
+					encryptedBytes = anAES.encrypt(convertToBytes(getPortion(pixels,(16 * i),(16 * (i + 1)))));
+				}
+				catch(Exception e){
+					System.out.println(e);
+				}
 			}
 			for(int j = 0; j < encrypted.length; j += 1){
 				encrypted[(i * 16) + j] = (int) encryptedBytes[j];
@@ -470,8 +480,8 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 	public static String convertToText(int[] messageNumbers){
 		
 		/*
-		 * Given an array of integers, returns the message represented by the 
-		 * numbers.
+		 * Given an array of one digit integers, returns the message represented by 
+		 * the numbers.
 		 */
 		
 		String message = "";
@@ -480,7 +490,7 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 			characterNumbers[0] = messageNumbers[(3*i)];
 			characterNumbers[1] = messageNumbers[(3*i)+1];
 			characterNumbers[2] = messageNumbers[(3*i)+2];
-			message.concat(Character.toString((char) digitsToInt(characterNumbers)));
+			message = message.concat(Character.toString((char) digitsToInt(characterNumbers)));
 		}
 		return message;
 		
@@ -573,7 +583,9 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		/* Accounts for the fact that blue can not exceed
 		   255. */
 		else if((number[2] - blue[2]) > 5){
-			blue[1] -= 1;
+			if ((blue[0] != 0) || (blue[1] != 0)){
+				blue[1] -= 1;
+			}
 		}
 		/* If the number to put in is 5 greater than the current last digit,
 		   reduce the second digit by 1. */
@@ -593,7 +605,9 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		/* Accounts for the fact that green can not exceed
 		   255. */
 		else if((number[1] - green[2]) > 5){
-			green[1] -= 1;
+			if ((green[0] != 0) || (green[1] != 0)){
+				green[1] -= 1;
+			}
 		}
 		/* If the number to put in is 5 greater than the current last digit,
 		   reduce the second digit by 1. */
@@ -613,7 +627,9 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		/* Accounts for the fact that red can not exceed
 		   255. */
 		else if((number[0] - red[2]) > 5){
-			red[1] -= 1;
+			if ((red[0] != 0) || (red[1] != 0)){
+				red[1] -= 1;
+			}
 		}
 		/* If the number to put in is 5 greater than the current last digit,
 		   reduce the second digit by 1. */
