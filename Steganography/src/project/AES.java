@@ -11,7 +11,7 @@ public class AES {
 	byte[] key;
 	public byte[][] w;
 	byte[][] rCon;
-	byte[][] sBox;
+	public byte[][] sBox;
 	byte[][] iSBox;
 	static GaloisField galField;
 
@@ -136,20 +136,24 @@ public class AES {
 	}
 
 
-	public byte[] encrypt(byte[] input){
-		state = new byte[4][4];
-		state = TwoDimensionalArray.fromSingleArray(input);
-		addRoundKey(0);
-		for (int round = 1; round < numberOfRounds; ++round){
-			subBytes(); 
-			shiftRows();  
-			mixColumns(); 
-			addRoundKey(round);
-		}  
-		subBytes();
-		shiftRows();
-		addRoundKey(numberOfRounds);
-		return TwoDimensionalArray.toSingleArray(state);
+	public byte[] encrypt(byte[] input) throws WrongSizeArrayException{
+		if (input.length != 16)
+			throw new WrongSizeArrayException();
+		else{
+			state = new byte[4][4];
+			state = TwoDimensionalArray.fromSingleArray(input);
+			addRoundKey(0);
+			for (int round = 1; round < numberOfRounds; ++round){
+				subBytes(); 
+				shiftRows();  
+				mixColumns(); 
+				addRoundKey(round);
+			}  
+			subBytes();
+			shiftRows();
+			addRoundKey(numberOfRounds);
+			return TwoDimensionalArray.toSingleArray(state);
+		}
 	}
 
 
@@ -296,7 +300,9 @@ public class AES {
 					galField.mulBy2((int)temp[3][col]) );
 		}
 	}
-
+	/**
+	 * This is a great way to multiply two ints (base 16) together
+	 * But in order to optimize the code we used array lookups instead
 	public static int fieldMultiply(int a, int b) {
 		int p = 0;
 		for (int n=0; n<8; n++) {
@@ -309,7 +315,7 @@ public class AES {
 		}
 		return p;
 	}
-
+	**/
 	public byte[] decrypt(byte[] input){
 		state = new byte[4][4];
 		state = TwoDimensionalArray.fromSingleArray(input);

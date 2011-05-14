@@ -64,7 +64,7 @@ public class TwoDimensionalArray {
 	
 	public static byte[][] fromSingleArray(byte[] input){
 		byte[][] output = new byte[(input.length)/4][4];
-		for (int row = 0; row < 4; row = row + 1){
+		for (int row = 0; row < ((input.length)/4); row = row + 1){
 			for (int col = 0; col < 4; col = col + 1){
 				output[row][col] = input[((row * 4) + col)];
 			}
