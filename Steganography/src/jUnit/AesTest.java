@@ -41,10 +41,10 @@ public class AesTest {
 		}
 		AES test = new AES();
 		test.state = TwoDimensionalArray.fromSingleArray(byteArray);
-		TwoDimensionalArray.print(test.state);
+		//TwoDimensionalArray.print(test.state);
 		test.subBytes();
-		TwoDimensionalArray.print(test.sBox);
-		TwoDimensionalArray.print(test.state);
+		//TwoDimensionalArray.print(test.sBox);
+		//TwoDimensionalArray.print(test.state);
 		assertTrue("Sub Bytes 1", test.state[0][0] == 99);
 		assertTrue("Sub Bytes 2", test.state[0][1] == 103);
 		assertTrue("Sub Bytes 3", test.state[0][2] == -6);
@@ -130,6 +130,38 @@ public class AesTest {
 	
 	@Test
 	public void testInvShiftRows(){
-		
+		byte[] byteArray = new byte[16];
+		for (int count = 0; count < 16; count++)
+			byteArray[count] = (byte)(count);
+		AES testAES = new AES();
+		testAES.state = TwoDimensionalArray.fromSingleArray(byteArray);
+		testAES.inverseShiftRows();
+		assertTrue("Inverse Shift Rows 1", testAES.state[0][0] == 0);
+		assertTrue("Inverse Shift Rows 2", testAES.state[0][1] == 1);
+		assertTrue("Inverse Shift Rows 3", testAES.state[1][0] == 7);
+		assertTrue("Inverse Shift Rows 4", testAES.state[1][1] == 4);
+		assertTrue("Inverse Shift Rows 5", testAES.state[2][0] == 10);
+		assertTrue("Inverse Shift Rows 6", testAES.state[2][1] == 11);
+		assertTrue("Inverse Shift Rows 7", testAES.state[3][0] == 13);
+		assertTrue("Inverse Shift Rows 8", testAES.state[3][1] == 14);
 	}
+	
+	@Test
+	public void testInvSubBytes(){
+		byte[] byteArray = new byte[16];
+		for(int count = 0; count < 16; count++){
+			byteArray[count] = (byte)((count * 10));
+		}
+		AES test = new AES();
+		test.state = TwoDimensionalArray.fromSingleArray(byteArray);
+		test.inverseSubBytes();
+		assertTrue("Inverse Sub Bytes 1", test.state[0][0] == 82);
+		assertTrue("Inverse Sub Bytes 2", test.state[0][1] == -93);
+		assertTrue("Inverse Sub Bytes 3", test.state[0][2] == -101);
+		assertTrue("Inverse Sub Bytes 4", test.state[0][3] == -23);
+		assertTrue("Inverse Sub Bytes 5", test.state[1][0] == -18);
+		assertTrue("Inverse Sub Bytes 6", test.state[2][1] == 70);
+		assertTrue("Inverse Sub Bytes 7", test.state[3][2] == -16);
+	}
+	
 }
