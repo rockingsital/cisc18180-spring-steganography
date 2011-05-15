@@ -6,6 +6,11 @@ import org.junit.Before;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
+/**
+ * @author Stephen Herbein, Ronald Lewis, Kyle Tucker
+ * Tests for the EncodeAndDecode.
+ */
+
 public class EncodeAndDecodeTest {
 
 	int[] getPixelDataTest1;
