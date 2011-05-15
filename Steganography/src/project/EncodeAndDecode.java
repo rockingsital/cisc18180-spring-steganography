@@ -1,5 +1,7 @@
 package project;
 
+/* 0df4cdd217c14575575c155e4a4ce45d3aed9ceb9ccce132*/
+
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
@@ -85,13 +87,16 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 			messageData[i] = (int) message.charAt(i);
 		}
 		/* Converts each message character to an integer. */
+		for (int k: messageData){
+			System.out.println(k);
+		}
 		messageData = encryption(messageData,anAES);
 		/* Encrypts the message. */
 		for (int j = 0; j < width; j+= 1){
 			/* Controls movement through the image 
 			   horizontally. */
 			for (int i = 0; ((((j * height) + i) <= 
-					message.length()+1) && (i < height)); 
+					messageData.length + 1) && (i < height)); 
 					i += 1){
 				/* Controls movement through the image 
 				   vertically. */
@@ -103,12 +108,12 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 					   image to indicate a text message is
 					   within it. */
 				}
-				else if (((j * height) + i) == (message.length() + 1)){
+				else if (((j * height) + i) == (messageData.length + 1)){
 					encodedImage.setRGB(minX + j,minY + i,changeColor(
 							new Color(encodedImage.getRGB(
 									(minX + j),(minY + i))),423).getRGB());
 					/* Places 423 in the current pixel of the
-					   image to indicate the end of the message
+					   image to indicate the end of the encrypted message
 					   has been reached. + 1 accounts for start 
 					   up code. */
 					try{
@@ -359,6 +364,7 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 			else{
 				try{
 					encryptedBytes = anAES.encrypt(convertToBytes(getPortion(hiddenData,(16 * i),(16 * (i + 1)))));
+					System.out.println(AES.arrayToString(encryptedBytes));
 				}
 				catch(Exception e){
 					System.out.println(e);
@@ -366,11 +372,13 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 				/* Encrypts 16 bytes of the given integer array. */
 			}
 			for(int j = 0; j < encryptedBytes.length; j += 1){
-				if(encryptedBytes[j] >= 0){
-					encrypted[(i * 16) + j] = (int) encryptedBytes[j];
-				}
-				else{
-					encrypted[(i * 16 + j)] = (int) (encryptedBytes[j]) + 256;
+				if ((hiddenData.length % 16) != 0){
+					if(encryptedBytes[j] >= 0){
+						encrypted[(i * 16) + j] = (int) encryptedBytes[j];
+					}
+					else{
+						encrypted[(i * 16 + j)] = (int) (encryptedBytes[j]) + 256;
+					}
 				}
 			}
 			/* Adds the 16 encrypted bytes to the larger array holding all the
@@ -390,6 +398,7 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 	
 	public static int[] decryption(int[] encrypted,AES anAES){
 		
+		System.out.println(encrypted.length % 16);
 		/**
 		 * Holds the decrypted information representing the secret message or image.
 		 */
@@ -623,8 +632,11 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 					/* Gets the integers representing the character in the current pixel. */
 					if((currentPixel[0] == 4) && (currentPixel[1] == 2) && (currentPixel[2] == 3)){
 						/* Occurs when the end code 423 is found. */
-						messageNumbers = decryption(messageNumbers,anAES);
+						messageNumbers = decryption(getPortion(messageNumbers,0,((j * height) + i - 1)),anAES);
 						/* Decrypts the integers representing the message. */
+						for (int k: messageNumbers){
+							System.out.println(k);
+						}
 						message = convertToText(messageNumbers);
 						/* Converts the integers representing the hidden message
 						   to a string. */
