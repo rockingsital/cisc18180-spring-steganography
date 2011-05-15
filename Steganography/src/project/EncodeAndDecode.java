@@ -13,14 +13,29 @@ import java.awt.TextArea;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 
+/**
+ * @author Stephen Herbein, Ronald Lewis, Kyle Tucker
+ * Encodes text messages and images into an image and decodes them.
+ */
+
 public class EncodeAndDecode{
 
+	/**
+	 * Encodes a text message in an image.
+	 * 
+	 * Writes encoded image to a png file.
+	 * 
+	 * @param original File containing the image where the text will be hidden.
+	 * @param writeTo File where the new image should be written to.
+	 * @param message Text to be hidden in the image.
+	 * @param anAES Object used for Encryption.
+	 */
+	
 public static void encodeText(File original,File writeTo,String message,AES anAES){
 		
-		/*
-		 * Hides a text message in an image.
+		/**
+		 * Holds the image to be encoded into.
 		 */
-		
 		BufferedImage encodedImage = null;
 		try{
 			encodedImage = ImageIO.read(original);
@@ -29,55 +44,70 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 			System.out.println(e);
 			return;
 		}
+		/* Gets a BufferedImage from the given File. */
+		/**
+		 * Indicates how much the encoded image must be scaled up.
+		 */
 		int scaleFactor = 1;
-		while((message.length()) > (scaleFactor * scaleFactor * encodedImage.getHeight() * encodedImage.getWidth())){
+		while((message.length() + 2) > (scaleFactor * scaleFactor * encodedImage.getHeight() * encodedImage.getWidth())){
 			scaleFactor += 1;
 		}
 		/* Determines the scaleFactor needed to fit all the
-		   information from the message into the
-		   image without changing its appearance.
-		   i.e. the image must have as many pixels as the
-		   message has characters. */
+		   information from the message into the image.
+		   i.e. the image must have enough pixels to fit the
+		   message, the start code, and the end code. */
 		encodedImage = scaleUp(encodedImage,scaleFactor);
+		/**
+		 * Starting x coordinate of the encoded image.
+		 */
 		int minX = encodedImage.getMinX();
+		/**
+		 * Starting y coordinate of the encoded image.
+		 */
 		int minY = encodedImage.getMinY();
+		/**
+		 * Width of the encoded image.
+		 */
 		int width = encodedImage.getWidth();
+		/**
+		 * Height of the encoded image.
+		 */
 		int height = encodedImage.getHeight();
+		/* Variables used to move through the encoded image. */
+		/**
+		 * Integers representing the message.
+		 */
 		int[] messageData = new int[message.length()];
 		for (int i = 0; i < messageData.length; i += 1){
 			messageData[i] = (int) message.charAt(i);
 		}
+		/* Converts each message character to an integer. */
 		messageData = encryption(messageData,anAES);
+		/* Encrypts the message. */
 		for (int j = 0; j < width; j+= 1){
 			/* Controls movement through the image 
 			   horizontally. */
-			/* Too Long Lines ??? */
 			for (int i = 0; ((((j * height) + i) <= 
 					message.length()+1) && (i < height)); 
 					i += 1){
 				/* Controls movement through the image 
 				   vertically. */
 				if (i == 0 && j == 0){
-					encodedImage.setRGB(minX + j,minY + i,
-							changeColor(new Color(encodedImage.
-							getRGB((minX + j),(minY + i))
-							),342).getRGB());
+					encodedImage.setRGB(minX + j,minY + i,changeColor(
+							new Color(encodedImage.getRGB(
+									(minX + j),(minY + i))),342).getRGB());
 					/* Places 342 in the first pixel of the
 					   image to indicate a text message is
-					   within it. + 1 accounts for presence of
-				   	   start up and end codes. */
-					/* Text Code??? */
+					   within it. */
 				}
-				else if (((j * height) + i) == (message.length()+1)){
-					encodedImage.setRGB(minX + j,minY + i,
-							changeColor(new Color(encodedImage.
-							getRGB((minX + j),(minY + i))
-							),423).getRGB());
+				else if (((j * height) + i) == (message.length() + 1)){
+					encodedImage.setRGB(minX + j,minY + i,changeColor(
+							new Color(encodedImage.getRGB(
+									(minX + j),(minY + i))),423).getRGB());
 					/* Places 423 in the current pixel of the
 					   image to indicate the end of the message
 					   has been reached. + 1 accounts for start 
 					   up code. */
-					/* End Code??? */
 					try{
 						ImageIO.write(encodedImage,"png",writeTo);
 						showImage(encodedImage);
@@ -85,14 +115,14 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 					catch (Exception e){
 						System.out.println(e);
 					}
+					/* Writes encoded image to a file and displays it. */
 					return;
 				}
 				else{
-					encodedImage.setRGB(minX + j,minY + i,
-							changeColor(new Color(encodedImage.
-							getRGB((minX + j),(minY + i))
-							),messageData[(j * height) + i - 1])
-							.getRGB());
+					encodedImage.setRGB(minX + j,minY + i,changeColor(
+							new Color(encodedImage.getRGB(
+									(minX + j),(minY + i))),
+									messageData[(j * height) + i - 1]).getRGB());
 					/* Changes the Color of the current pixel
 				   	so that a character of the message is
 				   	held within it. */
@@ -103,13 +133,26 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 
+	/**
+	 * Encodes an image in another image.
+	 * 
+	 * Writes encoded image to a png file.
+	 * 
+	 * @param hideThis File containing image to be hidden.
+	 * @param hideIn File containing image that will contain other image.
+	 * @param writeTo File where the new image should be written to.
+	 * @param anAES Object used for Encryption.
+	 */
+
 	public static void encodePicture(File hideThis,File hideIn,String writeTo,AES anAES){
 	
-		/*
-		 * Hides an image in another image.
+		/**
+		 * Holds image to be hidden in another image.
 		 */
-	
 		BufferedImage imageToHide = null;
+		/**
+		 * Holds image where the other image will be hidden.
+		 */
 		BufferedImage placeToHide = null;
 		try{
 			imageToHide = ImageIO.read(hideThis);
@@ -119,45 +162,75 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 			System.out.println(e);
 			return;
 		}
+		/* Gets both BufferedImages from the given Files. */
+		/**
+		 * Indicates how much the encoded image must be scaled up.
+		 */
 		int scaleFactor = 1;
-		while(((3 * imageToHide.getWidth() * imageToHide.getHeight()) + 3 > ((scaleFactor * scaleFactor * placeToHide.getHeight() * placeToHide.getWidth())))){
+		while(((3 * imageToHide.getWidth() * imageToHide.getHeight()) + 2 > ((scaleFactor * scaleFactor * placeToHide.getHeight() * placeToHide.getWidth())))){
 			scaleFactor += 1;
 		}
 		/* Determines the scaleFactor needed to fit all the
-	   	information from the original image into the
-	   	new image without changing its appearance.
+	   	information from the original image into the new image.
 	   	i.e. the new image must have 3 times as many
-	   	pixels as the original + 3 after scaling to fit the image, 
-	   	dimensions, and end code.*/
+	   	pixels as the original + 3 after scaling to fit the image and 
+	   	its dimensions.*/
 		placeToHide = scaleUp(placeToHide,scaleFactor);
+		/**
+		 * Starting X Coordinate of the image to be hidden.
+		 */
 		int imageMinX = imageToHide.getMinX();
+		/**
+		 * Starting Y Coordinate of the image to be hidden.
+		 */
 		int imageMinY = imageToHide.getMinY();
+		/**
+		 * Width of the image to be hidden.
+		 */
 		int imageWidth = imageToHide.getWidth();
+		/**
+		 * Height of the image to be hidden.
+		 */
 		int imageHeight = imageToHide.getHeight();
-		/* Properties of the original image used to move through
-	   	pixels of the image using a loop. */
+		/* Variables used to move through the image to be hidden. */
+		/**
+		 * Numbers representing the pixels of the image to be hidden.
+		 */
 		int[] imagePixels = new int[3 * imageWidth * imageHeight];
+		/**
+		 * Numbers representing the current pixel of the image to be hidden.
+		 */
 		int[] currentPixelData = new int[3];
 		for (int j = 0; j < imageWidth; j+= 1){
-			/* Controls movement through the image 
-		   	horizontally. */
+			/* Controls movement through the image to be hidden horizontally. */
 			for (int i = 0; i < imageHeight; i += 1){
-				/* Controls movement through the image 
-			   	vertically. */
+				/* Controls movement through the image to be hidden vertically. */
 				currentPixelData = getPixelData(new Color(imageToHide.getRGB(imageMinX + j, imageMinY + i)));
-				/* Gets the integers representing the pixels in the original image. */
+				/* Gets the integers representing the current pixel in the original image. */
 				imagePixels[3 * ((j * imageHeight) + i)] = currentPixelData[0];
 				imagePixels[3 * ((j * imageHeight) + i) + 1] = currentPixelData[1];
 				imagePixels[3 * ((j * imageHeight) + i) + 2] = currentPixelData[2];
 			}
 		}
 		imagePixels = encryption(imagePixels,anAES);
+		/* Encrypts the image to be hidden. */
+		/**
+		 * Minimum X Coordinate of the image where the other will be hidden.
+		 */
 		int placeMinX = placeToHide.getMinX();
+		/**
+		 * Minimum Y Coordinate of the image where the other will be hidden. 
+		 */
 		int placeMinY = placeToHide.getMinY();
+		/**
+		 * Width of the image where the other will be hidden.
+		 */
 		int placeWidth = placeToHide.getWidth();
+		/**
+		 * Height of the image where the other will be hidden.
+		 */
 		int placeHeight = placeToHide.getHeight();
-		/* Properties of the new image used to move through
-	   	pixels of the image using a loop. */
+		/* Variables used to move through the image where the other will be hidden. */
 		for(int j = 0; j < placeWidth; j += 1){
 			/* Controls movement through the image 
 		   	horizontally. */
@@ -167,11 +240,17 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 				if((i == 0) && (j == 0)){
 					placeToHide.setRGB(placeMinX,placeMinY,changeColor(new Color(placeToHide.getRGB(placeMinX,placeMinY)),imageWidth).getRGB());
 				}
+				/* Puts the width of the hidden image in the other image. */
 				else if((i == 1) && (j == 0)){
 					placeToHide.setRGB(placeMinX,placeMinY + 1,changeColor(new Color(placeToHide.getRGB(placeMinX,placeMinY + 1)),imageHeight).getRGB());
 				}
+				/* Puts the height of the hidden image in the other image. */
 				else if((j * placeHeight) + i == imagePixels.length + 2){
 					placeToHide.setRGB(placeMinX + j,placeMinY + i,changeColor(new Color(placeToHide.getRGB(placeMinX + j,placeMinY + i)),423).getRGB());
+					/* Places 423 in the current pixel of the
+					   image to indicate the end of the hidden image
+					   has been reached. + 2 accounts for the dimensions
+					   of the hidden image. */
 					try{
 						ImageIO.write(placeToHide,"png",new File(writeTo));
 						showImage(placeToHide);
@@ -179,23 +258,38 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 					catch(Exception e){
 						System.out.println(e);
 					}
+					/* Writes the new image to a File and displays it. */
 					return;
 				}
 				else{
 					placeToHide.setRGB(placeMinX + j, placeMinY + i,changeColor(new Color(placeToHide.getRGB(placeMinX + j,placeMinY + i)),imagePixels[(j * placeHeight) + i - 2]).getRGB());
 				}
+				/* Places the number representing the color component of the hidden
+				   image in a pixel of the other image. */
 			}
 		}
 		return;
 		
 	}
 
+	/**
+	 * Returns an array containing the red, green, and blue components of the given Color.
+	 * 
+	 * @param pixelColor Color of the current pixel.
+	 * @return Integer array containing the red, green, and blue components of the given Color. 
+	 */
+	
 	public static int[] getPixelData(Color pixelColor){
 		
 		/*
-		 * Returns an int[] representing the given Color.
+		 * Example:
+		 * getPixelData(new Color(37,162,245))
+		 * return == [37,162,245]
 		 */
 		
+		/**
+		 * Contains the red, green, and blue components of the given Color.
+		 */
 		int[] pixelData = new int[3];
 		pixelData[0] = pixelColor.getRed();
 		pixelData[1] = pixelColor.getGreen();	
@@ -204,26 +298,44 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Encrypts the information representing the secret message or image.
+	 * 
+	 * @param pixels Numbers representing the pixels of the image to be hidden.
+	 * @param anAES Object used for Encryption.
+	 * @return Encrypted representation of the pixels of the image to be hidden.
+	 */
+	
 	public static int[] encryption(int[] pixels,AES anAES){
 		
-		/*
-		 * Encrypts the information representing the secret message or image.
+		/**
+		 * Contains the encrypted information representing the pixels of the image to be hidden.
 		 */
-		
 		int[] encrypted = new int[pixels.length];
+		/**
+		 * Temporarily holds encrypted bytes before they are added to the larger array.
+		 * 
+		 * Encryption occurs 16 bytes as a time. 
+		 */
 		byte[] encryptedBytes = new byte[16];
 		for (int i = 0; i <= (pixels.length/16); i += 1){
 			if(i == (pixels.length/16)){
 				encryptedBytes = convertToBytes(getPortion(pixels,(16 * i),(pixels.length % 16)));
+				/* Adds the last of the integer array to the byte array to be encrypted.  */
 				for (int j = (pixels.length % 16); j < (16 * (i+1)); j += 1){
-					encryptedBytes[j] = (char) ' ';
+					encryptedBytes[j] = (byte) ' ';
 				}
+				/* If the number of elements in the given integer array is not a
+				   multiple of 16, the extra bytes needed to reach 16 for the last
+				   part of encryption are added as the byte equivalent of blank
+				   spaces. */
 				try{
 					encryptedBytes = anAES.encrypt(encryptedBytes);
 				}
 				catch(Exception e){
 					System.out.println(e);
 				}
+				/* Encrypts 16 bytes of the given integer array. */
 			}
 			else{
 				try{
@@ -232,39 +344,62 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 				catch(Exception e){
 					System.out.println(e);
 				}
+				/* Encrypts 16 bytes of the given integer array. */
 			}
 			for(int j = 0; j < encrypted.length; j += 1){
 				encrypted[(i * 16) + j] = (int) encryptedBytes[j];
 			}
+			/* Adds the 16 encrypted bytes to the larger array holding all the
+			   encrypted. */
 		}
 		return encrypted;
 		
 	}
 
+	/**
+	 * Decrypts the information representing the secret message or image.
+	 * 
+	 * @param encrypted Encrypted information representing the secret message or image.
+	 * @param anAES Object used for Decryption.
+	 * @return Decrypted information representing the secret message or image.
+	 */
+	
 	public static int[] decryption(int[] encrypted,AES anAES){
 		
-		/*
-		 * Decrypts the information representing the secret message or image.
+		/**
+		 * Holds the decrypted information representing the secret message or image.
 		 */
-		
 		int[] decrypted = new int[encrypted.length];
+		/**
+		 * Temporarily holds decrypted bytes before they are added to the larger array. 
+		 *
+		 *  Decryption occurs 16 bytes at a time.
+		 */
 		byte[] decryptedBytes = new byte[16];
 		for (int i = 0; i < (decrypted.length/16); i += 1){
 			decryptedBytes = anAES.decrypt(convertToBytes(getPortion(encrypted,(16*i),(16*(i+1)))));
+			/* Decrypts 16 bytes of the secret message or image. */
 			for (int j = 0; j < 16; j += 1){
 				decrypted[(16 * i) + j] = (int) decryptedBytes[j];
 			}
+			/* Adds the 16 decrypted bytes to the larger array of all the decrypted information. */
 		}
 		return decrypted;
 		
 	}
 	
+	/**
+	 * Converts an int array to a byte array.
+	 * 
+	 * @param ints An array of integers.
+	 * @return Byte equivalent of the given integer array.
+	 */
+	
 	public static byte[] convertToBytes(int[] ints){
-		
-		/*
-		 * Converts an int array to a byte array.
-		 */
 
+		/**
+		 * Byte equivalent of the given integer array. 
+		 */
 		byte[] bytes = new byte[ints.length];
 		for (int i = 0; i < ints.length; i += 1){
 			bytes[i] = (byte) ints[i];
@@ -273,13 +408,28 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Returns a portion of the given integer array.
+	 * 
+	 * Returned array does not include the given end index.
+	 * 
+	 * @param original An integer array.
+	 * @param startIndex The first index of the given array to be included. 
+	 * @param endIndex The index after the last index of the given array to be included.
+	 * @return A portion of the given integer array.
+	 */
+	
 	public static int[] getPortion(int[] original,int startIndex, int endIndex){
 		
 		/*
-		 * Returns an int[] that contains the elements of the given array from
-		 * the start index to (but not including) the end index.
+		 * Example:
+		 * getPortion([1,2,3,4,5],1,4)
+		 * return == [2,3,4]
 		 */
 		
+		/**
+		 * The portion of the given array to be returned.
+		 */
 		int[] portion = new int[endIndex - startIndex];
 		for (int i = startIndex; i < endIndex; i += 1){
 			portion[i - startIndex] = original[i];
@@ -287,14 +437,29 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		return portion;
 		
 	}
+
+	/**
+	 * Returns a portion of the given byte array.
+	 * 
+	 * Returned array does not include the given end index.
+	 * 
+	 * @param original A byte array.
+	 * @param startIndex The first index of the given array to be included. 
+	 * @param endIndex The index of the given array after the last index to be included.
+	 * @return A portion of the given integer array.
+	 */
 	
 	public static byte[] getPortion(byte[] original,int startIndex, int endIndex){
 		
 		/*
-		 * Returns an byte[] that contains the elements of the given array from
-		 * the start index to (but not including) the end index.
+		 * Example:
+		 * getPortion([1,2,3,4,5],1,4)
+		 * return == [2,3,4]
 		 */
 		
+		/**
+		 * The portion of the given array to be returned.
+		 */
 		byte[] portion = new byte[endIndex - startIndex];
 		for (int i = startIndex; i < endIndex; i += 1){
 			portion[i - startIndex] = original[i];
@@ -303,8 +468,19 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Gets the hidden message or image from the given image.
+	 *
+	 * @param encoded File containing the encoded image.
+	 * @param writeTo Location the new File should be written to.
+	 * @param password Key required for decryption.
+	 */
+	
 	public static void decode(File encoded, File writeTo, String password){
 		
+		/**
+		 * The image containing the hidden message or image.
+		 */
 		BufferedImage encodedImage = null;
 		try{
 			encodedImage = ImageIO.read(encoded);
@@ -313,81 +489,130 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 			System.out.println(e);
 			return;
 		}
+		/* Gets a BufferedImage from the given File. */
+		/**
+		 * Holds the key for decryption.
+		 */
 		byte[] key = new byte[password.length()];
 		for(int i = 0; i < key.length; i += 1){
 			key[i] = (byte) password.charAt(i);
 		}
+		/* Gets the byte equivalent of the given password. */
+		/**
+		 * Object for decryption.
+		 */
 		AES anAES = new AES(key);
 		if (checkText(encodedImage)){
 			decodeText(encodedImage,writeTo,anAES);
 		}
+		/* If an image contains a message, it is decoded as such. */
 		else{
 			decodeImage(encodedImage,writeTo,anAES);
 		}
+		/* If an image does not contain a message, it is decoded as an image. */
 		return;
 		
 	}
 	
+	/**
+	 * Returns a boolean representing if a message is encoded in the image.
+	 * 
+	 * @param encodedImage Image to be checked for a hidden message.
+	 * @return Whether or not the given image contains a message.
+	 */
+	
 	public static boolean checkText(BufferedImage encodedImage){
 		
-		/*
-		 * Returns a boolean representing if a text file is encoded in the image.
+		/**
+		 * Color of the pixel in the upper left corner of the given image.
 		 */
-		
 		Color pixelColor = new Color(encodedImage.getRGB(encodedImage.getMinX(),encodedImage.getMinY()));
 		if (((pixelColor.getRed() % 10) == 3) && ((pixelColor.getGreen() % 10) == 4) && ((pixelColor.getBlue() % 10) == 2)){
 			return true;
 		}
+		/* If the code 342 is in the upper left corner of the given image, the image
+		   contains a hidden message. */
 		else{
 			return false;
 		}
 		
 	}
 
+	/**
+	 * Gets the hidden message from an image.
+	 * 
+	 * Writes message to a text file.
+	 * 
+	 * @param encodedImage Image containing the hidden message.
+	 * @param writeTo Location to write the new file.
+	 * @param anAES Object used for Decryption.
+	 */
+	
 	public static void decodeText(BufferedImage encodedImage,File writeTo,AES anAES){
 		
-		/* Recovers the message from the given image and writes it to the desired
-		   file location. */
-		
+		/**
+		 * Holds the hidden message.
+		 */
 		String message = "";
+		/**
+		 * First X Coordinate of the image with the message in it.
+		 */
 		int minX = encodedImage.getMinX();
+		/**
+		 * First Y Coordinate of the image with the message in it.
+		 */
 		int minY = encodedImage.getMinY();
+		/**
+		 * Width of the image with the message in it.
+		 */
 		int width = encodedImage.getWidth();
+		/**
+		 * Height of the image with the message in it.
+		 */
 		int height = encodedImage.getHeight();
 		/* Properties of the image used to move through
 		   pixels of the image using a loop. */
+		/**
+		 * Holds the integers representing the hidden message.
+		 */
 		int[] messageNumbers = new int[width*height];
-		/* Holds the numbers representing the hidden message within the picture. */
+		/**
+		 * Holds the integers representing the character in the current pixel.
+		 */
 		int[] currentPixel = new int[3];
 		for (int j = 0; j < width; j+= 1){
-			/* Controls movement through the image 
-			   horizontally. */
-			/* Too Long Lines ??? */
-			for (int i = 0; i < height; 
-					i += 1){
-				/* Controls movement through the image 
-				   vertically. */
+			/* Controls movement through the image horizontally. */
+			for (int i = 0; i < height; i += 1){
+				/* Controls movement through the image vertically. */
 				if ((i == 0) && (j == 0)){
-					/* Accounts for presence of code 
-					   indicating a text message is
+					/* Accounts for presence of code indicating a text message is
 					   hidden within the image. */
 				}
 				else{
-					/* Change ??? */
-					currentPixel = getPixelDigits(new Color(encodedImage.
-							getRGB((minX + j),(minY + i))));
+					currentPixel = getPixelDigits(new Color(encodedImage.getRGB(
+							(minX + j),(minY + i))));
+					/* Gets the integers representing the character in the current pixel. */
 					if((currentPixel[0] == 4) && (currentPixel[1] == 2) && (currentPixel[2] == 3)){
+						/* Occurs when the end code 423 is found. */
 						messageNumbers = decryption(messageNumbers,anAES);
+						/* Decrypts the integers representing the message. */
 						message = convertToText(messageNumbers);
+						/* Converts the integers representing the hidden message
+						   to a string. */
 						try{
 							BufferedWriter output = new BufferedWriter(new FileWriter(writeTo));
 							output.write(message);
 							output.close();
+							/* Writes the hidden message to a text file. */
+							/**
+							 * Used to display the hidden message. 
+							 */
 							JFrame frame = new JFrame("Drawing Frame");
 						    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 						    frame.getContentPane().add(new TextArea(message));
 						    frame.setSize(400,400);
 						    frame.setVisible(true);
+						    /* Displays the hidden message in a text area. */
 						}
 						catch (Exception e){
 							System.out.println(e);
@@ -398,6 +623,9 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 						messageNumbers[(3*((j*width)+i-1))] = currentPixel[0];
 						messageNumbers[(3*((j*width)+i-1))+1] = currentPixel[1];
 						messageNumbers[(3*((j*width)+i-1))+2] = currentPixel[2];
+						/* Adds the integers representing the character in the
+						   current pixel to the array of integers representing
+						   the entire message. */
 					}
 				}
 			}
@@ -406,35 +634,58 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Gets the image hidden in the given encoded image.
+	 * 
+	 * Writes hidden image to a png file.
+	 * 
+	 * @param encodedImage Image with another image hidden within it.
+	 * @param writeTo Location to write the hidden image to.
+	 * @param anAES Object used for Decryption.
+	 */
+	
 	public static void decodeImage(BufferedImage encodedImage,File writeTo,AES anAES){
 		
-		/* Recovers the image from the given image and writes it to the desired
-		   file location. */
-		
+		/**
+		 * First X Coordinate of the image with the hidden image within it.
+		 */
 		int encodedMinX = encodedImage.getMinX();
+		/**
+		 * First Y Coordinate of the image with the hidden image within it.
+		 */
 		int encodedMinY = encodedImage.getMinY();
+		/**
+		 * Width of the image with the hidden image within it.
+		 */
 		int encodedWidth = encodedImage.getWidth();
+		/**
+		 * Height of the image with the hidden image within it.
+		 */
 		int encodedHeight = encodedImage.getHeight();
 		/* Properties of the encoded image used to move through
 		   pixels of the image using a loop. */
+		/**
+		 * Width of the hidden image.
+		 */
 		int hiddenWidth = 0;
+		/**
+		 * Height of the hidden image.
+		 */
 		int hiddenHeight = 0;
 		/* Properties of the hidden image used to move through 
 		   pixels of the image using a loop. */
+		/**
+		 * Holds the integers representing the pixels of the hidden image.
+		 */
 		int[] hiddenPixels = null;
-		/* Variable used to move hold the pixel data for the hidden
-		   image. */
+		/**
+		 * Temporarily holds integer hidden within the current pixel.
+		 */
 		int pixelInt = 0;
-		/* Holds information about number hidden in the current pixel
-		   of the encoded image. */
 		for (int j = 0; j < encodedWidth; j+= 1){
-			/* Controls movement through the image 
-			   horizontally. */
-			/* Too Long Lines ??? */
-			for (int i = 0; i < encodedHeight; 
-					i += 1){
-				/* Controls movement through the image 
-				   vertically. */
+			/* Controls movement through the image horizontally. */
+			for (int i = 0; i < encodedHeight; i += 1){
+				/* Controls movement through the image vertically. */
 				if ((i == 0) && (j == 0)){
 					/* Gets width of hidden image. */
 					hiddenWidth = getHiddenInt(new Color(encodedImage.getRGB(encodedMinX,encodedMinY)));
@@ -445,15 +696,23 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 					hiddenPixels = new int[3 * hiddenWidth * hiddenHeight];
 				}
 				else{
-					pixelInt = getHiddenInt(new Color(encodedImage.
-							getRGB((encodedMinX + j),(encodedMinY + i))));
+					pixelInt = getHiddenInt(new Color(encodedImage.getRGB(
+							(encodedMinX + j),(encodedMinY + i))));
+					/* Gets the number hidden in the current pixel. */
 					if (pixelInt == 423){
+						/* Occurs when the end code is found. */
 						hiddenPixels = decryption(hiddenPixels,anAES);
+						/* Decrypts the numbers representing hidden image. */
 						rebuildImage(hiddenPixels,hiddenWidth,hiddenHeight,writeTo);
+						/* Recreates the hidden image. */
 						return;
 					}
 					else{
 						hiddenPixels[(j * encodedHeight) + i - 2] = pixelInt;
+						/* Puts the number representing the current pixel into the
+						   larger array containing all the pixels' information. 
+						   -2 accounts for the presence of the hidden image 
+						   dimensions in the encoded image. */
 					}
 				}
 			}
@@ -462,13 +721,24 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Gets the hidden code in the current pixel.
+	 * 
+	 * @param pixelColor Color of the current pixel.
+	 * @return Hidden code in the current pixel.
+	 */
+	
 	public static int[] getPixelDigits(Color pixelColor){
 		
 		/*
-		 * Returns the last digits of the Red, Green, and Blue components of the 
-		 * given Color.
+		 * Example:
+		 * getPixelDigits(new Color(131,222,43))
+		 * return == [1,2,3]
 		 */
 		
+		/**
+		 * Holds the hidden code obtained from the current pixel.
+		 */
 		int[] pixelDigits = new int[3];
 		pixelDigits[0] = intToDigits(pixelColor.getRed())[2];
 		pixelDigits[1] = intToDigits(pixelColor.getGreen())[2];
@@ -477,42 +747,67 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Converts the integers representing the hidden message to text.
+	 * 
+	 * @param messageNumbers Integers representing the hidden message.
+	 * @return The hidden message represented by the given integer array.
+	 */
+	
 	public static String convertToText(int[] messageNumbers){
 		
 		/*
-		 * Given an array of one digit integers, returns the message represented by 
-		 * the numbers.
+		 * Example:
+		 * convertToText([065,066,067])
+		 * return == "ABC"
 		 */
 		
+		/**
+		 * Hidden message.
+		 */
 		String message = "";
+		/**
+		 * Integers representing the current character in the hidden message.
+		 */
 		int[] characterNumbers = new int[3];
 		for(int i = 0; i < messageNumbers.length/3; i += 1){
 			characterNumbers[0] = messageNumbers[(3*i)];
 			characterNumbers[1] = messageNumbers[(3*i)+1];
 			characterNumbers[2] = messageNumbers[(3*i)+2];
 			message = message.concat(Character.toString((char) digitsToInt(characterNumbers)));
+			/* Adds the current character to the end of the message. */
 		}
 		return message;
 		
 	}
 	
+	/**
+	 * Creates an image from data about its pixels, width, and height.
+	 * 
+	 * @param pixels Integers representing the pixels in the hidden image.
+	 * @param width Width of the hidden image.
+	 * @param height Height of the hidden image.
+	 * @param writeTo Location to write the hidden image to.
+	 */
+	
 	public static void rebuildImage(int[] pixels,int width,int height,File writeTo){
 		
-		/*
-		 * Creates an image from data about its pixels, width, and height.
+		/**
+		 * Hidden image.
 		 */
-		
 		BufferedImage hiddenImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 		for (int j = 0; j < width; j += 1){
 			/* Moves through image horizontally. */
 			for (int i = 0; i < height; i += 1){
 				/* Moves through image vertically. */
 				hiddenImage.setRGB(j,i,new Color(pixels[3 *((j * height) + i)],pixels[3 * ((j * height) + i) + 1],pixels[3 * ((j * height) + i) + 2]).getRGB());
+				/* Sets a pixel in the hidden image based on the integers in the given array. */
 			}
 		}
 		try{
 			ImageIO.write(hiddenImage,"png",writeTo);
 			showImage(hiddenImage);
+			/* Writes and displays the hidden image. */
 		}
 		catch(Exception e){
 			System.out.println(e);
@@ -521,12 +816,24 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Returns the integer hidden in the Color of a pixel.
+	 * 
+	 * @param pixelColor Color of the current pixel.
+	 * @return Hidden code in the current pixel.
+	 */
+	
 	public static int getHiddenInt(Color pixelColor){
 		
 		/*
-		 * Returns the int hidden in the Color of a pixel.
+		 * Example:
+		 * getHiddenInt(new Color(131,142,203))
+		 * return == 123
 		 */
 		
+		/**
+		 * Holds the digits of the hidden code in the current pixel. 
+		 */
 		int[] digits = new int[3];
 		digits[0] = intToDigits(pixelColor.getRed())[2];
 		digits[1] = intToDigits(pixelColor.getGreen())[2];
@@ -535,12 +842,19 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Scales an image up by the given scale factor.
+	 * 
+	 * @param original Image to be scaled up.
+	 * @param scaleFactor Amount the image should be scaled up by.
+	 * @return Scaled up image.
+	 */
+	
 	public static BufferedImage scaleUp(BufferedImage original,int scaleFactor){
 		
-		/* Increases the number of pixels in the given image
-		 * by the given factor.
+		/**
+		 * Scaled up image.
 		 */
-		
 		BufferedImage scaledUp = new BufferedImage(original.getWidth() * scaleFactor,original.getHeight() * scaleFactor, BufferedImage.TYPE_INT_RGB);
 		for (int i = 0; i < original.getHeight(); i += 1){
 			/* Controls vertical movement through the image. */
@@ -551,30 +865,47 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 						scaledUp.setRGB((j*scaleFactor)+k,(i*scaleFactor)+l,original.getRGB(j,i));
 					}
 				}
-				/* Converts a scaleFactor x scaleFactor 
-				   area of pixels in the new image to match 
-				   a single pixel in the original image. */
+				/* Converts a (scaleFactor * width) x (scaleFactor * height) area of 
+				   pixels in the new image to match a single pixel in the original 
+				   image. */
 			}
 		}
 		return scaledUp;
 		
 	}
 	
+	/**
+	 * Changes the given Color to hold the given number.
+	 * 
+	 * @param currentColor A color for the number to be hidden in.
+	 * @param inputNumber The number to be hidden in the Color.
+	 * @return Given Color with the given number inside of it.
+	 */
+	
 	public static Color changeColor(Color currentColor,int inputNumber){
 		
 		/*
-		 * Returns a Color representing the given number
-		 * being placed in the given Color.
+		 * Example:
+		 * changeColor(Color(133,144,155),236)
+		 * return == Color(132,143,156)
 		 */
 		
+		/**
+		 * Red component of the given color.
+		 */
 		int[] red = intToDigits(currentColor.getRed());
+		/**
+		 * Green component of the given color.
+		 */
 		int[] green = intToDigits(currentColor.getGreen());
+		/**
+		 * Blue component of the given color.
+		 */
 		int[] blue = intToDigits(currentColor.getBlue());
-		/* Breaks the integers representing the red, green, 
-		   and blue components of the pixel color into its
-		   digits. */
+		/**
+		 * Digits of the given number.
+		 */
 		int[] number = intToDigits(inputNumber);
-		/* Breaks the input number into its digits. */
 		
 		
 		if ((blue[0] == 2) && (blue[1] == 5) && (number[2] > 5)){
@@ -648,14 +979,18 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
-	/* Too many digits Exception??? */
+	/**
+	 * Converts an integer to its digits.
+	 * 
+	 * Integer must be 3 digit or less.
+	 * 
+	 * @param aNumber Integer to be converted to its digits.
+	 * @return Digits of the given integer.
+	 */
+	
 	public static int[] intToDigits(int aNumber){
 		
 		/*
-		 * Returns an array of 3 integers representing the
-		 * three digits of the given integer. This method
-		 * should not be called on an integer with more than
-		 * three digits.
 		 * Example:
 		 * intToDigits(137)
 		 * return == [1,3,7]
@@ -663,6 +998,9 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		 * return == [0,5,3]
 		 */
 		
+		/**
+		 * Digits of the given number.
+		 */
 		int[] digits = new int[3];
 		digits[0] = aNumber / 100;
 		/* The integer component of a three-digit number divided 
@@ -679,13 +1017,18 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 	
 	}
 	
-	/* Incorrect Array Size Exception??? */
+	/**
+	 * Converts digits into an integer.
+	 * 
+	 * Must provide 3 digits.
+	 * 
+	 * @param digits Digits to be converted to an integer.
+	 * @return Integer represented by the given digits.
+	 */
+	
 	public static int digitsToInt(int[] digits){
 		
 		/*
-		 * Returns the integer represented by an array of
-		 * integers.  Should not be called on anything
-		 * but an array of size 3.
 		 * Example:
 		 * digitsToInt([1,3,7])
 		 * return == 137
@@ -703,18 +1046,23 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		
 	}
 	
+	/**
+	 * Displays the given image.
+	 * 
+	 * @param anImage Image to be displayed.
+	 */
 	public static void showImage(BufferedImage anImage){
-		
-		/*
-		 * Displays the given image.
+
+		/**
+		 * Used to display the given image.
 		 */
-		
 		JFrame frame = new JFrame("Drawing Frame");
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    MyCanvas canvas = new MyCanvas(anImage);
 	    frame.getContentPane().add(canvas);
 	    frame.setSize(1000,1000);
 	    frame.setVisible(true);
+	    /* Displays the given image. */
 	    return;
 		
 	}
@@ -725,11 +1073,13 @@ class MyCanvas extends JComponent{
 	
 	BufferedImage image;
 	
+	/**
+	 * Constructor for the MyCanvas class.
+	 * 
+	 * @param anImage Image to be displayed.
+	 */
+	
 	public MyCanvas(BufferedImage anImage){
-		
-		/*
-		 * Constructor for the MyCanvas class. 
-		 */
 		
 		image = anImage;
 		
