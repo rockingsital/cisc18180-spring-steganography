@@ -127,4 +127,9 @@ public class AesTest {
 		assertTrue("Shift Rows 7", testAES.state[3][0] == 15);
 		assertTrue("Shift Rows 8", testAES.state[3][1] == 12);
 	}
+	
+	@Test
+	public void testInvShiftRows(){
+		
+	}
 }
