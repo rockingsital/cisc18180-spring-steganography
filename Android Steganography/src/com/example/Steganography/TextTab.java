@@ -1,18 +1,26 @@
 package com.example.Steganography;
 
 import com.example.Steganography.R;
+import com.example.Steganography.PictureTab.EncodeAndDecodeTask;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 public class TextTab extends Activity{
 	
 	TextView textTargetUri;
+	RadioGroup radioGroup;
+	ProgressDialog pd;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -22,7 +30,9 @@ public class TextTab extends Activity{
 
 		Button buttonLoadImage = (Button)findViewById(R.id.button1);
 		textTargetUri = (TextView)findViewById(R.id.textView3);
-
+		Button buttonGo = (Button)findViewById(R.id.button3);
+		radioGroup = (RadioGroup)findViewById(R.id.radioGroup1);
+		
 		buttonLoadImage.setOnClickListener(new Button.OnClickListener(){
 
 			@Override
@@ -32,6 +42,14 @@ public class TextTab extends Activity{
 						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				startActivityForResult(intent, 0);
 			}});
+		
+		buttonGo.setOnClickListener(new Button.OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				new EncodeAndDecodeTask().execute();
+			}});
 	}
 
 	@Override
@@ -40,5 +58,37 @@ public class TextTab extends Activity{
 		super.onActivityResult(requestCode, resultCode, data);
 		Uri targetUri = data.getData();
 		textTargetUri.setText(targetUri.toString());
+	}
+	
+	public class EncodeAndDecodeTask extends AsyncTask<Void, Void, Void>{
+
+		protected void onPreExecute(){
+			pd = ProgressDialog.show(TextTab.this, "Working..", "Working on your image.", true, false);
+		}
+		@Override
+		protected Void doInBackground(Void... params) {
+			if (radioGroup.getCheckedRadioButtonId() == 0){
+				//Add the encode call here
+			}
+			else if (radioGroup.getCheckedRadioButtonId() == 1){
+				//Add the decode call here
+			}
+			int count = 0;
+			double test = 0;
+			for(int i = 0; i < 10000000; i++)
+				count++;
+				test = 2 * count;
+			return null;
+		}
+		protected void onPostExecute(Void unused){
+			pd.dismiss();
+			final AlertDialog alertDialog = new AlertDialog.Builder(TextTab.this).create();
+			alertDialog.setMessage("Done!");
+			alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+			      public void onClick(DialogInterface dialog, int which) {
+			    	 // alertDialog.dismiss();
+			    } });
+			alertDialog.show();
+		}
 	}
 }
