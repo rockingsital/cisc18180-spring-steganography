@@ -1,3 +1,9 @@
+/**
+ * @author Ron Lewis, Stephen Herbein, and Kyle Tucker
+ * 
+ * This class defines all of the Galois Fields required for encryption.
+ */
+
 package project;
 
 public class GaloisField {
@@ -9,6 +15,13 @@ public class GaloisField {
 	public byte[] thirteen;
 	public byte[] fourteen;
 
+	/**
+	 * This method correctly multiplies the specified int by the two Galois field. 
+	 * 
+	 * @param input
+	 * @return 
+	 */
+	
 	public int mulBy2(int input){
 		if (input < 0)
 			input += 256;
@@ -17,6 +30,13 @@ public class GaloisField {
 		else
 			return two[input];
 	}
+	
+	/**
+	 * This method correctly multiplies the specified int by the three Galois field. 
+	 * 
+	 * @param input
+	 * @return
+	 */
 	
 	public int mulBy3(int input){
 		if (input < 0)
@@ -27,6 +47,13 @@ public class GaloisField {
 			return three[input];
 	}
 	
+	/**
+	 * This method correctly multiplies the specified int by the nine Galois field. 
+	 * 
+	 * @param input
+	 * @return
+	 */
+	
 	public int mulBy9(int input){
 		if (input < 0)
 			input += 256;
@@ -35,6 +62,13 @@ public class GaloisField {
 		else
 			return nine[input];
 	}
+	
+	/**
+	 * This method correctly multiplies the specified int by the eleven Galois field. 
+	 * 
+	 * @param input
+	 * @return
+	 */
 	
 	public int mulBy11(int input){
 		if (input < 0)
@@ -45,6 +79,13 @@ public class GaloisField {
 			return eleven[input];
 	}
 	
+	/**
+	 * This method correctly multiplies the specified int by the thirteen Galois field. 
+	 * 
+	 * @param input
+	 * @return
+	 */
+	
 	public int mulBy13(int input){
 		if (input < 0)
 			input += 256;
@@ -53,6 +94,13 @@ public class GaloisField {
 		else
 			return thirteen[input];
 	}
+	
+	/**
+	 * This method correctly multiplies the specified int by the fourteen Galois field. 
+	 * 
+	 * @param input
+	 * @return
+	 */
 	
 	public int mulBy14(int input){
 		if (input < 0)
@@ -63,7 +111,10 @@ public class GaloisField {
 			return fourteen[input];
 	}
 	
-	
+	/**
+	 * This is the constructor for this class. It creates Galois field arrays for 
+	 * multiplication by 2, 3, 9, 11, 13, and 14.
+	 */
 	
 	public GaloisField(){
 		//TWO

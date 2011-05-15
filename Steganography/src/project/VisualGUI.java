@@ -1,3 +1,9 @@
+/**
+ * @author Ron Lewis, Stephen Herbein, and Kyle Tucker
+ * 
+ * This class creates the front end GUI for the Steganography project.
+ */
+
 package project;
 
 import javax.swing.SwingUtilities;
@@ -61,7 +67,7 @@ public class VisualGUI extends JFrame {
 	private JTextField decodeOutputName = null;
 	private JLabel decodeOutputNameLabel = null;
 	/**
-	 * This method initializes tabs	
+	 * This method initializes all of the tabs.	
 	 * 	
 	 * @return javax.swing.JTabbedPane	
 	 */
@@ -76,7 +82,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encode	
+	 * This method initializes the encode tab
 	 * 	
 	 * @return javax.swing.JSplitPane	
 	 */
@@ -91,7 +97,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes leftSideEncode	
+	 * This method initializes the left side of the encode panel	
 	 * 	
 	 * @return javax.swing.JPanel	
 	 */
@@ -142,7 +148,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes rightSideEncode	
+	 * This method initializes the right side of the encode panel	
 	 * 	
 	 * @return javax.swing.JPanel	
 	 */
@@ -160,7 +166,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeTextRadio	
+	 * This method initializes the encoding text radio button	
 	 * 	
 	 * @return javax.swing.JRadioButton	
 	 */
@@ -184,7 +190,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodePictureRadio	
+	 * This method initializes encoding picture radio button
 	 * 	
 	 * @return javax.swing.JRadioButton	
 	 */
@@ -208,7 +214,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeStartingPicture	
+	 * This method initializes the starting picture pane	
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -221,7 +227,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeStartingBrowse	
+	 * This method initializes the starting picture browse button
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
@@ -251,7 +257,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeSecretText	
+	 * This method initializes the secret text text field
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -265,7 +271,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeSecretPicture	
+	 * This method initializes the secret picture text field
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -279,7 +285,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeSecretBrowse	
+	 * This method initializes the secret picture browse button
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
@@ -310,7 +316,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeOutput	
+	 * This method initializes the output location text field
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -323,7 +329,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeOutputBrowse	
+	 * This method initializes the output location browse button	
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
@@ -347,7 +353,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeButton	
+	 * This method initializes the encode button
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
@@ -382,7 +388,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeSecretPicturePane	
+	 * This method initializes the secret picture scroll pane
 	 * 	
 	 * @return javax.swing.JScrollPane	
 	 */
@@ -395,7 +401,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeOriginalImagePane	
+	 * This method initializes the original image scroll pane
 	 * 	
 	 * @return javax.swing.JScrollPane	
 	 */
@@ -408,7 +414,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decode	
+	 * This method initializes the decode tab
 	 * 	
 	 * @return javax.swing.JPanel	
 	 */
@@ -449,7 +455,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decodeStartingPicture	
+	 * This method initializes the decode starting picture text field
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -462,7 +468,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decodeOutputLocation	
+	 * This method initializes the decode output location text field
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -475,7 +481,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decodeStartingPictureBrowse	
+	 * This method initializes the decode starting picture browse button
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
@@ -506,7 +512,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decodeOutputLocationBrowse	
+	 * This method initializes the decode output location browse button	
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
@@ -531,7 +537,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decodePassword	
+	 * This method initializes the password text field
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -544,7 +550,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decodeButton	
+	 * This method initializes the decode button
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
@@ -556,7 +562,12 @@ public class VisualGUI extends JFrame {
 			decodeButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					File newFileName = new File(decodeArguments[1], decodeOutputName.getText());
-					EncodeAndDecode.decode(decodeArguments[0], newFileName, decodePassword.getText());
+					if (decodePassword.getText().length() != 48){
+						throw new IncorrectPasswordLengthException();
+					}
+					else{
+						EncodeAndDecode.decode(decodeArguments[0], newFileName, decodePassword.getText());
+					}
 				}
 			});
 		}
@@ -564,7 +575,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decodeStartingPicturePane	
+	 * This method initializes the decode starting picture pane	
 	 * 	
 	 * @return javax.swing.JScrollPane	
 	 */
@@ -577,7 +588,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes encodeOutputName	
+	 * This method initializes the encode output name text field
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -591,7 +602,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes decodeOutputName	
+	 * This method initializes the decode output name text field
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
@@ -605,7 +616,8 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * @param args
+	 * 
+	 * @param args Does nothing
 	 */
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -618,7 +630,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This is the default constructor
+	 * This is the default constructor for this class
 	 */
 	public VisualGUI() {
 		super();
@@ -626,7 +638,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes this
+	 * This method initializes the entire GUI
 	 * 
 	 * @return void
 	 */
@@ -637,7 +649,7 @@ public class VisualGUI extends JFrame {
 	}
 
 	/**
-	 * This method initializes jContentPane
+	 * This method initializes the content pane of the GUI
 	 * 
 	 * @return javax.swing.JPanel
 	 */
@@ -650,4 +662,4 @@ public class VisualGUI extends JFrame {
 		return jContentPane;
 	}
 
-}  //  @jve:decl-index=0:visual-constraint="-3,-34"
+}  

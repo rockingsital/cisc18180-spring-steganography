@@ -1,3 +1,10 @@
+/**
+ * @author Ron Lewis, Stephen Herbein, and Kyle Tucker
+ * 
+ * This class allows for the creation of a JPanel that contains a BufferedImage. 
+ * The image is also Scrollable (able to be placed inside a JScrollPane).
+ */
+
 package project;
 
 import java.awt.Dimension;
@@ -19,6 +26,13 @@ public class ImagePanel extends JPanel implements Scrollable{
 	BufferedImage image;
 	private int maxUnitIncrement = 1;
 
+	/**
+	 * This is the constructor for this class. It takes a JTextField and reads an image
+	 * from its text.
+	 * 
+	 * @param desiredLocation A JTextField containing the location of the image.
+	 */
+	
 	public ImagePanel(JTextField desiredLocation){
 
 		try{
@@ -30,16 +44,38 @@ public class ImagePanel extends JPanel implements Scrollable{
 
 	}
 
+	/**
+	 * This method paints the image, and overrides the paint method in JPanel.
+	 * 
+	 * @param g
+	 */
+	
 	public void paintComponent(Graphics g) {
 		g.drawImage(image, 0, 0, null);
 	}
 
+	/**
+	 * This method is implemented from the Scrollable interface.
+	 * 
+	 * @return The preferred size of the panel
+	 */
+	
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
 		
 		return getPreferredSize();
 	}
 
+	/**
+	 * This method is implemented from the Scrollable interface. It defines a 
+	 * scrollable block increment.
+	 * 
+	 * @param visibleRect The current visible Rectangle
+	 * @param orientation The orientation of the Rectangle
+	 * @param direction The direction of the Rectangle
+	 * @return The int that determines the scrollable block increment
+	 */
+	
 	@Override
 	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
 
@@ -50,18 +86,40 @@ public class ImagePanel extends JPanel implements Scrollable{
         }
 	}
 
+	/**
+	 * This method is implemented from the Scrollable interface.
+	 * 
+	 * @return the boolean value that determined the track's viewport height
+	 */
+	
 	@Override
 	public boolean getScrollableTracksViewportHeight() {
 		
 		return false;
 	}
 
+	/**
+	 * This method is implemented from the Scrollable interface.
+	 * 
+	 * @return the boolean value that determined the track's viewport width
+	 */
+	
 	@Override
 	public boolean getScrollableTracksViewportWidth() {
 		
 		return false;
 	}
 
+	/**
+	 * This method is implemented from the Scrollable interface. It defines
+	 * a scrollable unit increment.
+	 * 
+	 * @param visibleRect The current visible Rectangle
+	 * @param orientation The orientation of the Rectangle
+	 * @param direction The direction of the Rectangle
+	 * @return The int that determines the scrollable unit increment
+	 */
+	
 	@Override
 	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
 		int currentPosition = 0;
