@@ -330,29 +330,31 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		 */
 		byte[] encryptedBytes = new byte[16];
 		for (int i = 0; i <= (hiddenData.length/16); i += 1){
-			if((i == (hiddenData.length/16) && (hiddenData.length % 16 != 0))){
-				/**
-				 * Holds the last of the pixel data to be encrypted.
-				 */
-				byte[] lastPortion = convertToBytes(getPortion(hiddenData,(16 * i),((16 * i) + hiddenData.length % 16)));
-				for (int j = 0; j < lastPortion.length; j += 1){
-					encryptedBytes[j] = lastPortion[j];
+			if((i == (hiddenData.length/16))){
+				if(hiddenData.length % 16 != 0){
+					/**
+					 * Holds the last of the pixel data to be encrypted.
+					 */
+					byte[] lastPortion = convertToBytes(getPortion(hiddenData,(16 * i),((16 * i) + hiddenData.length % 16)));
+					for (int j = 0; j < lastPortion.length; j += 1){
+						encryptedBytes[j] = lastPortion[j];
+					}
+					/* Adds the last of the integer array to the byte array to be encrypted.  */
+					for (int j = (hiddenData.length % 16); j < 16; j += 1){
+						encryptedBytes[j] = (byte) ' ';
+					}
+					/* If the number of elements in the given integer array is not a
+				   	multiple of 16, the extra bytes needed to reach 16 for the last
+				   	part of encryption are added as the byte equivalent of blank
+				   	spaces. */
+					try{
+						encryptedBytes = anAES.encrypt(encryptedBytes);
+					}
+					catch(Exception e){
+						System.out.println(e);
+					}
+					/* Encrypts 16 bytes of the given integer array. */
 				}
-				/* Adds the last of the integer array to the byte array to be encrypted.  */
-				for (int j = (hiddenData.length % 16); j < 16; j += 1){
-					encryptedBytes[j] = (byte) ' ';
-				}
-				/* If the number of elements in the given integer array is not a
-				   multiple of 16, the extra bytes needed to reach 16 for the last
-				   part of encryption are added as the byte equivalent of blank
-				   spaces. */
-				try{
-					encryptedBytes = anAES.encrypt(encryptedBytes);
-				}
-				catch(Exception e){
-					System.out.println(e);
-				}
-				/* Encrypts 16 bytes of the given integer array. */
 			}
 			else{
 				try{
