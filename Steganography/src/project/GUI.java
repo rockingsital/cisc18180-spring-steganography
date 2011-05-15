@@ -147,10 +147,10 @@ public class GUI extends JPanel implements ActionListener{
 					String writeTo = desiredLocation.getText();
 					File hideThis = new File(secretInfo);
 					File hideIn = fromFile;
-					EncodeAndDecode.encodePicture(hideThis, hideIn, writeTo);
+					//EncodeAndDecode.encodePicture(hideThis, hideIn, writeTo);
 				}
 				else{
-					EncodeAndDecode.encodeText(fromFile, toFile, secretInfo);
+					//EncodeAndDecode.encodeText(fromFile, toFile, secretInfo);
 				}
 				ImagePanel imgPanel = new ImagePanel(desiredLocation);
 				add(imgPanel);
