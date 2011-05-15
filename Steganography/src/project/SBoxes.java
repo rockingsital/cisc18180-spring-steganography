@@ -1,17 +1,18 @@
+/**
+ * @author Ron Lewis, Stephen Herbein, and Kyle Tucker
+ * 
+ * This class contains the SBoxes required for encryption.
+ */
+
 package project;
 
 public class SBoxes {
+	
 	/**
-	public void multiplicativeInverse(byte s, byte x){
-		if((s >> 7) == 1){
-			s = (byte) (s << 1);
-			s = (byte) (s + 1);
-		}
-		else{
-			s = (byte) (s << 1);
-		}
-	}
-	**/
+	 * This method builds an SBox by simply making and filling an array.
+	 * 
+	 * @return The SBox
+	 */
 	
 	public static byte[][] buildSBox(){
 		byte[][] output = new byte[16][16];
@@ -273,6 +274,12 @@ public class SBoxes {
 		output[15][15]	=(byte)0x16;
 		return output;
 	}
+	
+	/**
+	 * This method builds an IBox by simply making and filling an array.
+	 * 
+	 * @return The IBox
+	 */
 	
 	public static byte[][] buildISBox(){
 		byte[][] output = new byte[16][16];

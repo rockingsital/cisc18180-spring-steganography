@@ -13,7 +13,7 @@ public class Hexidecimal {
 	}
 	
 	
-	public static int char2Hex(char input) throws SteveCodedThisException{
+	public static int char2Hex(char input) throws Exception{
 		switch (input){
 			case '0': return 0; 
 			case '1': return 1; 
@@ -31,7 +31,7 @@ public class Hexidecimal {
 			case 'd': return 13;
 			case 'e': return 14;
 			case 'f': return 15;
-			default: throw new SteveCodedThisException();
+			default: throw new Exception();
 		}
 	}
 }
