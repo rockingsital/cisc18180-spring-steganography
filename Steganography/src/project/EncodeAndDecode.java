@@ -304,17 +304,23 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 	/**
 	 * Encrypts the information representing the secret message or image.
 	 * 
-	 * @param pixels Numbers representing the pixels of the image to be hidden.
+	 * @param hiddenData Numbers representing the hidden .
 	 * @param anAES Object used for Encryption.
-	 * @return Encrypted representation of the pixels of the image to be hidden.
+	 * @return Encrypted representation of the hiddenData of the image to be hidden.
 	 */
 	
-	public static int[] encryption(int[] pixels,AES anAES){
+	public static int[] encryption(int[] hiddenData,AES anAES){
 		
 		/**
-		 * Contains the encrypted information representing the pixels of the image to be hidden.
+		 * Contains the encrypted information representing the hiddenData of the image to be hidden.
 		 */
-		int[] encrypted = new int[pixels.length + (16 - (pixels.length % 16))];
+		int[] encrypted = null;
+		if ((hiddenData.length % 16) == 0){
+			encrypted = new int[hiddenData.length];
+		}
+		else{
+			encrypted = new int[hiddenData.length + (16 - (hiddenData.length % 16))];
+		}
 		/* Encryption occurs 16 bytes at a time. Thus, the total number of encrypted bytes
 		   must be a multiple of 16. */
 		/**
@@ -323,17 +329,17 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		 * Encryption occurs 16 bytes as a time. 
 		 */
 		byte[] encryptedBytes = new byte[16];
-		for (int i = 0; i <= (pixels.length/16); i += 1){
-			if(i == (pixels.length/16)){
+		for (int i = 0; i <= (hiddenData.length/16); i += 1){
+			if((i == (hiddenData.length/16) && (hiddenData.length % 16 != 0))){
 				/**
 				 * Holds the last of the pixel data to be encrypted.
 				 */
-				byte[] lastPortion = convertToBytes(getPortion(pixels,(16 * i),((16 * i) + pixels.length % 16)));
+				byte[] lastPortion = convertToBytes(getPortion(hiddenData,(16 * i),((16 * i) + hiddenData.length % 16)));
 				for (int j = 0; j < lastPortion.length; j += 1){
 					encryptedBytes[j] = lastPortion[j];
 				}
 				/* Adds the last of the integer array to the byte array to be encrypted.  */
-				for (int j = (pixels.length % 16); j < 16; j += 1){
+				for (int j = (hiddenData.length % 16); j < 16; j += 1){
 					encryptedBytes[j] = (byte) ' ';
 				}
 				/* If the number of elements in the given integer array is not a
@@ -350,7 +356,7 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 			}
 			else{
 				try{
-					encryptedBytes = anAES.encrypt(convertToBytes(getPortion(pixels,(16 * i),(16 * (i + 1)))));
+					encryptedBytes = anAES.encrypt(convertToBytes(getPortion(hiddenData,(16 * i),(16 * (i + 1)))));
 				}
 				catch(Exception e){
 					System.out.println(e);
