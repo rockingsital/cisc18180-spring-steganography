@@ -259,7 +259,7 @@ public class AES {
 			}
 			try {
 				output[col] = sBox[Hexidecimal.char2Hex(sRow)][Hexidecimal.char2Hex(sCol)];
-			} catch (SteveCodedThisException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -306,7 +306,7 @@ public class AES {
 				}
 				try {
 					state[row][col] = sBox[Hexidecimal.char2Hex(sRow)][Hexidecimal.char2Hex(sCol)];
-				} catch (SteveCodedThisException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -440,7 +440,7 @@ public class AES {
 				}
 				try {
 					state[row][col] = iSBox[Hexidecimal.char2Hex(sRow)][Hexidecimal.char2Hex(sCol)];
-				} catch (SteveCodedThisException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
