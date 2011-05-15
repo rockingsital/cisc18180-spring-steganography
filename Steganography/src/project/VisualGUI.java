@@ -359,14 +359,18 @@ public class VisualGUI extends JFrame {
 			encodeButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					File newFileName = new File(encodeArguments[1], encodeOutputName.getText());
+					AES anAES = new AES();
 					if (encodeTextRadio.isSelected()){
 						EncodeAndDecode.encodeText(encodeArguments[0], 
 								newFileName, 
-								encodeSecretText.getText());
+								encodeSecretText.getText(),
+								anAES);
 					}
 					else if (encodePictureRadio.isSelected()){
 						EncodeAndDecode.encodePicture(encodeArguments[2], 
-								encodeArguments[0], newFileName.getAbsolutePath());
+								encodeArguments[0], 
+								newFileName.getAbsolutePath(),
+								anAES);
 					}
 					else{
 						System.out.println("Please select to encode with either a picture or with text.");
@@ -604,7 +608,6 @@ public class VisualGUI extends JFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				VisualGUI thisClass = new VisualGUI();
