@@ -4,11 +4,14 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import java.io.File;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.TextArea;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -110,7 +113,7 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 					   up code. */
 					try{
 						ImageIO.write(encodedImage,"png",writeTo);
-						showImage(encodedImage);
+						showImage(encodedImage,anAES);
 					}
 					catch (Exception e){
 						System.out.println(e);
@@ -253,7 +256,7 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 					   of the hidden image. */
 					try{
 						ImageIO.write(placeToHide,"png",new File(writeTo));
-						showImage(placeToHide);
+						showImage(placeToHide,anAES);
 					}
 					catch(Exception e){
 						System.out.println(e);
@@ -311,7 +314,9 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		/**
 		 * Contains the encrypted information representing the pixels of the image to be hidden.
 		 */
-		int[] encrypted = new int[pixels.length];
+		int[] encrypted = new int[pixels.length + (16 - (pixels.length % 16))];
+		/* Encryption occurs 16 bytes at a time. Thus, the total number of encrypted bytes
+		   must be a multiple of 16. */
 		/**
 		 * Temporarily holds encrypted bytes before they are added to the larger array.
 		 * 
@@ -320,9 +325,15 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		byte[] encryptedBytes = new byte[16];
 		for (int i = 0; i <= (pixels.length/16); i += 1){
 			if(i == (pixels.length/16)){
-				encryptedBytes = convertToBytes(getPortion(pixels,(16 * i),(pixels.length % 16)));
+				/**
+				 * Holds the last of the pixel data to be encrypted.
+				 */
+				byte[] lastPortion = convertToBytes(getPortion(pixels,(16 * i),((16 * i) + pixels.length % 16)));
+				for (int j = 0; j < lastPortion.length; j += 1){
+					encryptedBytes[j] = lastPortion[j];
+				}
 				/* Adds the last of the integer array to the byte array to be encrypted.  */
-				for (int j = (pixels.length % 16); j < (16 * (i+1)); j += 1){
+				for (int j = (pixels.length % 16); j < 16; j += 1){
 					encryptedBytes[j] = (byte) ' ';
 				}
 				/* If the number of elements in the given integer array is not a
@@ -346,8 +357,13 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 				}
 				/* Encrypts 16 bytes of the given integer array. */
 			}
-			for(int j = 0; j < encrypted.length; j += 1){
-				encrypted[(i * 16) + j] = (int) encryptedBytes[j];
+			for(int j = 0; j < encryptedBytes.length; j += 1){
+				if(encryptedBytes[j] >= 0){
+					encrypted[(i * 16) + j] = (int) encryptedBytes[j];
+				}
+				else{
+					encrypted[(i * 16 + j)] = (int) (encryptedBytes[j]) + 256;
+				}
 			}
 			/* Adds the 16 encrypted bytes to the larger array holding all the
 			   encrypted. */
@@ -380,7 +396,12 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 			decryptedBytes = anAES.decrypt(convertToBytes(getPortion(encrypted,(16*i),(16*(i+1)))));
 			/* Decrypts 16 bytes of the secret message or image. */
 			for (int j = 0; j < 16; j += 1){
-				decrypted[(16 * i) + j] = (int) decryptedBytes[j];
+				if (decryptedBytes[j] >= 0){
+					decrypted[(16 * i) + j] = (int) decryptedBytes[j];
+				}
+				else{
+					decrypted[(16 * i) + j] = (int) (decryptedBytes[j]) + 256;
+				}
 			}
 			/* Adds the 16 decrypted bytes to the larger array of all the decrypted information. */
 		}
@@ -493,9 +514,9 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		/**
 		 * Holds the key for decryption.
 		 */
-		byte[] key = new byte[password.length()];
-		for(int i = 0; i < key.length; i += 1){
-			key[i] = (byte) password.charAt(i);
+		byte[] key = new byte[password.length()/2];
+		for(int i = 0; i < key.length; i += 2){
+			key[i/2] = (byte) ((Character.digit(password.charAt(i), 16) << 4) + Character.digit(password.charAt(i+1), 16));
 		}
 		/* Gets the byte equivalent of the given password. */
 		/**
@@ -600,18 +621,22 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 						/* Converts the integers representing the hidden message
 						   to a string. */
 						try{
+							System.out.println(message);
+							/*
 							BufferedWriter output = new BufferedWriter(new FileWriter(writeTo));
 							output.write(message);
-							output.close();
+							output.close();*/
 							/* Writes the hidden message to a text file. */
 							/**
 							 * Used to display the hidden message. 
 							 */
+							/*
 							JFrame frame = new JFrame("Drawing Frame");
 						    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 						    frame.getContentPane().add(new TextArea(message));
+						    frame.getContentPane().add(new TextArea(AES.arrayToString(anAES.key)));
 						    frame.setSize(400,400);
-						    frame.setVisible(true);
+						    frame.setVisible(true);*/
 						    /* Displays the hidden message in a text area. */
 						}
 						catch (Exception e){
@@ -973,7 +998,7 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 		/* Places the first digit representing the input
 		   number as the last digit of the red component
 		   of the pixel. */
-
+		
 		return new Color(digitsToInt(red),digitsToInt(green),
 				digitsToInt(blue));
 		
@@ -1047,24 +1072,56 @@ public static void encodeText(File original,File writeTo,String message,AES anAE
 	}
 	
 	/**
-	 * Displays the given image.
+	 * Displays the given image and the encryption key.
 	 * 
 	 * @param anImage Image to be displayed.
+	 * @param anAES Object used for Encryption.
 	 */
-	public static void showImage(BufferedImage anImage){
+	public static void showImage(BufferedImage anImage,AES anAES){
 
 		/**
 		 * Used to display the given image.
 		 */
 		JFrame frame = new JFrame("Drawing Frame");
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    /**
+	     * Used to display the given image.
+	     */
 	    MyCanvas canvas = new MyCanvas(anImage);
-	    frame.getContentPane().add(canvas);
-	    frame.setSize(1000,1000);
+	    /**
+	     * Used to display the given image.
+	     */
+	    JPanel panel = new JPanel();
+	    panel.add(canvas);
+	    panel.add(new JTextArea(AES.arrayToString(anAES.key)));
+	    panel.setLayout(new GridLayout());
+	    frame.getContentPane().add(panel);
+	    frame.setSize(anImage.getWidth() + 500,anImage.getHeight() + 100);
 	    frame.setVisible(true);
 	    /* Displays the given image. */
 	    return;
 		
+	}
+
+/**
+ * Displays the given image.
+ * 
+ * @param anImage Image to be displayed.
+ */
+public static void showImage(BufferedImage anImage){
+
+	/**
+	 * Used to display the given image.
+	 */
+	JFrame frame = new JFrame("Drawing Frame");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    MyCanvas canvas = new MyCanvas(anImage);
+    frame.getContentPane().add(canvas);
+    frame.setSize(anImage.getWidth(),anImage.getHeight());
+    frame.setVisible(true);
+    /* Displays the given image. */
+    return;
+	
 	}
 	
 }
